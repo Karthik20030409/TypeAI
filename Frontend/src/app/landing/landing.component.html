@@ -1,85 +1,65 @@
-<!-- NAV -->
-<nav class="nav">
-  <div class="logo">TYPE<span>•</span>AI</div>
-  <button class="nav-btn">Start Test</button>
-<button class="nav-btn" (click)="goToLogin()">
-  Login
-</button>
+<div class="app">
 
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">TYPE<span>•</span>AI</div>
 
-  <button class="nav-btn">Sign-Up</button>
+    <div class="header-actions">
+      <ng-container *ngIf="!isAuthenticated; else userMenu">
+        <button class="ghost" (click)="openLogin()">Login</button>
+        <button class="primary small" (click)="openSignup()">Sign up</button>
+      </ng-container>
 
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-
-  <div class="hero-content">
-    <h1>
-      Speed is<br />
-      <span>intelligence</span>
-    </h1>
-
-    <p>
-      A next-generation typing performance system.<br />
-      Built for humans who optimize.
-    </p>
-
-    <div class="hero-actions">
-      <button class="primary">Start Typing</button>
-      <span>Instant • No sign-up</span>
+      <ng-template #userMenu>
+        <div class="avatar-wrap">
+          <img [src]="user.avatar" alt="profile" />
+          <div class="dropdown">
+            <span>{{ user.name }}</span>
+            <button (click)="logout()">Logout</button>
+          </div>
+        </div>
+      </ng-template>
     </div>
-  </div>
+  </header>
 
-  <div class="hero-visual">
-    <div class="terminal">
-      <div class="line active">
-        the quick brown fox jumps over the lazy dog
-        <span class="cursor"></span>
-      </div>
+  <!-- MAIN -->
+  <main class="main">
+    <div class="hero">
+      <h1>Speed is <span>intelligence</span></h1>
+      <p>Measure your real cognitive typing performance.</p>
+
+      <button class="primary large" (click)="startTyping()">
+        {{ isAuthenticated ? 'Continue Typing' : 'Start Typing' }}
+      </button>
+
       <div class="stats">
         <div><strong>136</strong><span>WPM</span></div>
         <div><strong>97%</strong><span>Accuracy</span></div>
         <div><strong>0.9%</strong><span>Error</span></div>
       </div>
     </div>
-  </div>
-</section>
+  </main>
 
-<!-- TRUST / POWER -->
-<section class="power">
-  <div class="power-card">
-    <h2>Not a game. A performance instrument.</h2>
-    <p>
-      Designed with the same mindset used in elite trading desks,
-      aerospace systems, and neural interfaces.
-    </p>
-  </div>
-</section>
+  <!-- AUTH MODAL -->
+  <div class="overlay" *ngIf="showAuthModal" (click)="closeAuth()"></div>
 
-<!-- FEATURES -->
-<section class="features">
-  <div class="feature">
-    <h3>True WPM</h3>
-    <p>No inflation. No tricks. Pure signal.</p>
-  </div>
-  <div class="feature">
-    <h3>Flow Interface</h3>
-    <p>The UI disappears. You remain.</p>
-  </div>
-  <div class="feature">
-    <h3>Neural Feedback</h3>
-    <p>Error density, rhythm, consistency.</p>
-  </div>
-</section>
+  <div class="auth-modal" *ngIf="showAuthModal">
+    <h2>{{ authMode === 'login' ? 'Welcome back' : 'Create account' }}</h2>
 
-<!-- FINAL CTA -->
-<section class="final">
-  <h2>Measure what your brain can actually do.</h2>
-  <button class="primary large">Begin Test</button>
-</section>
+    <input *ngIf="authMode === 'signup'" placeholder="Name" />
+    <input placeholder="Email" />
+    <input type="password" placeholder="Password" />
 
-<footer>
-  © 2026 TYPE•AI — Precision over noise
-</footer>
+    <button class="primary full" (click)="authenticate()">
+      {{ authMode === 'login' ? 'Login' : 'Sign up' }}
+    </button>
+
+    <div class="switch">
+      {{ authMode === 'login' ? 'New here?' : 'Already have an account?' }}
+      <a (click)="switchMode()">
+        {{ authMode === 'login' ? 'Create account' : 'Login' }}
+      </a>
+    </div>
+  </div>
+
+</div>
