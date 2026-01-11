@@ -1,274 +1,175 @@
-/* =========================
-   THEME VARIABLES
-========================= */
 :host {
-  --bg-main: #f1f5f9;
-  --bg-surface: #f8fafc;
-  --bg-header: #ffffff;
-
-  --text-primary: #020617;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-
-  --border-soft: #e5e7eb;
-
-  --accent: #22c55e;
-  --accent-hover: #16a34a;
-
   display: block;
   height: 100vh;
+  overflow: hidden;
   font-family: Inter, system-ui, sans-serif;
-  background: var(--bg-main);
-  color: var(--text-primary);
+
+  --bg-main: #C9F2C7;
+  --bg-surface: #ACECA1;
+  --border-soft: #96BE8C;
+  --accent: #629460;
+  --text-main: #243119;
 }
 
-/* =========================
-   APP SHELL
-========================= */
 .app {
   display: grid;
   grid-template-rows: auto 1fr;
-  height: 100vh;
+  height: 100%;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 3rem;
-  background: var(--bg-header);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-soft);
 }
 
 .logo {
   font-weight: 900;
   font-size: 1.4rem;
-  letter-spacing: -0.02em;
-}
-.logo span {
-  color: var(--accent);
 }
 
-.header-actions {
+.actions {
   display: flex;
-  align-items: center;
   gap: 1rem;
 }
 
-/* =========================
-   BUTTONS
-========================= */
-.primary {
-  background: var(--accent);
-  color: #020617;
-  border: none;
-  padding: 0.6rem 1.6rem;
+button {
   border-radius: 999px;
-  font-weight: 700;
+  border: none;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
-}
-
-.primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-.primary:active {
-  transform: translateY(0);
-}
-
-.primary.large {
-  font-size: 1.1rem;
-  padding: 0.9rem 2.6rem;
-}
-
-.primary.small {
-  padding: 0.45rem 1.2rem;
+  font-weight: 600;
 }
 
 .ghost {
-  background: var(--bg-surface);
+  background: transparent;
   border: 1px solid var(--border-soft);
-  color: var(--text-primary);
-  padding: 0.5rem 1.2rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.15s ease;
+  padding: 0.45rem 1.2rem;
 }
 
-.ghost:hover {
-  background: #eef2f7;
+.primary {
+  background: var(--accent);
+  color: white;
+  padding: 0.6rem 1.6rem;
 }
 
-/* =========================
-   AVATAR / USER MENU
-========================= */
-.avatar-wrap {
-  position: relative;
-}
-
-.avatar-wrap img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.dropdown {
-  position: absolute;
-  right: 0;
-  top: 44px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  border-radius: 0.6rem;
-  padding: 0.8rem;
-  min-width: 140px;
-  display: none;
-  box-shadow: 0 20px 40px rgba(2,6,23,0.08);
-}
-
-.avatar-wrap:hover .dropdown {
-  display: block;
-}
-
-.dropdown span {
-  display: block;
-  font-size: 0.85rem;
-  margin-bottom: 0.6rem;
-  color: var(--text-secondary);
-}
-
-.dropdown button {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.85rem;
-  cursor: pointer;
-  color: #ef4444;
-}
-
-/* =========================
-   MAIN CONTENT
-========================= */
+/* MAIN */
 .main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100%;
+}
+
+.panel {
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-soft);
+  padding: 1.5rem;
+}
+
+.timer {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+/* HERO */
+.hero {
   display: grid;
   place-items: center;
 }
 
-.hero {
+.hero.shift-left {
+  place-items: start center;
+  padding-left: 4rem;
+}
+
+.hero-inner {
   text-align: center;
   max-width: 520px;
 }
 
-.hero h1 {
-  font-size: clamp(2.6rem, 5vw, 3.6rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
+.hero.shift-left .hero-inner {
+  text-align: left;
 }
 
-.hero h1 span {
-  color: var(--accent);
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 900;
 }
 
 .hero p {
-  margin: 1rem 0 2rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  margin: 1rem 0 1.8rem;
 }
 
-/* =========================
-   STATS (AD-READY ZONE)
-========================= */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  margin-top: 2.5rem;
+.warn {
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+  color: #7a2d2d;
 }
 
-.stats div {
-  min-width: 80px;
-}
-
-.stats strong {
-  font-size: 1.6rem;
-}
-
-.stats span {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* =========================
-   AUTH OVERLAY
-========================= */
-.overlay {
-  position: fixed;
+/* AUTH */
+.auth-card {
+  position: absolute;
   inset: 0;
-  background: rgba(2,6,23,0.45);
-  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.08);
 }
 
-/* =========================
-   AUTH MODAL
-========================= */
-.auth-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
+.auth-box {
   width: 340px;
-  transform: translate(-50%, -50%);
   background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
   padding: 2rem;
   border-radius: 1.2rem;
-  border: 1px solid var(--border-soft);
-  box-shadow: 0 40px 80px rgba(2,6,23,0.25);
 }
 
-.auth-modal h2 {
-  margin-bottom: 1.4rem;
-  font-size: 1.4rem;
-  font-weight: 800;
-}
-
-.auth-modal input {
+.auth-box input {
   width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.7rem;
+  padding: 0.6rem;
+  margin-top: 0.4rem;
   border-radius: 0.6rem;
   border: 1px solid var(--border-soft);
-  font-size: 0.9rem;
 }
 
-.auth-modal input:focus {
-  outline: none;
-  border-color: var(--accent);
+.input-warn {
+  font-size: 0.75rem;
+  color: #7a2d2d;
+  margin-bottom: 0.5rem;
 }
 
-.full {
-  width: 100%;
-}
-
-/* =========================
-   AUTH SWITCH
-========================= */
 .switch {
-  margin-top: 1rem;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  margin-top: 0.8rem;
 }
 
-.switch a {
+.switch span {
   color: var(--accent);
   cursor: pointer;
-  margin-left: 0.3rem;
 }
 
-.switch a:hover {
-  text-decoration: underline;
+/* AVATAR */
+.avatar {
+  position: relative;
+}
+
+.avatar img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  padding: 0.6rem;
 }
