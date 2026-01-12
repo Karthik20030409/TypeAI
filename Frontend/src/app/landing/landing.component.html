@@ -1,5 +1,4 @@
 <div class="app">
-
   <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
@@ -25,11 +24,10 @@
   <section
     class="main"
     [ngClass]="{
-      'center': !showAuth && !isAuthenticated,
+      center: !showAuth && !isAuthenticated,
       'with-panel': showAuth || isAuthenticated
     }"
   >
-
     <aside class="panel" *ngIf="isAuthenticated">
       <h4>Session</h4>
       <div class="timer">{{ timer }}s</div>
@@ -40,14 +38,15 @@
         <h1>Speed is intelligence</h1>
         <p>Measure real typing performance.</p>
 
-        <button class="primary" (click)="startTyping()">Start Typing</button>
+        <button class="primary" (click)="startTyping()">
+          Start Typing
+        </button>
 
         <div class="warn" *ngIf="showWarn">
           Please login or signup to continue
         </div>
       </div>
     </div>
-
   </section>
 
   <!-- AUTH -->
@@ -55,26 +54,35 @@
     <div class="auth-box">
       <h2>{{ authMode === 'login' ? 'Login' : 'Create account' }}</h2>
 
-      <ng-container *ngIf="authMode==='signup'">
+      <ng-container *ngIf="authMode === 'signup'">
         <input placeholder="Name" [(ngModel)]="name" />
-        <div class="input-warn" *ngIf="errors.name">{{ errors.name }}</div>
+        <div class="input-warn" *ngIf="errors.name">
+          {{ errors.name }}
+        </div>
       </ng-container>
 
       <input placeholder="Email" [(ngModel)]="email" />
-      <div class="input-warn" *ngIf="errors.email">{{ errors.email }}</div>
+      <div class="input-warn" *ngIf="errors.email">
+        {{ errors.email }}
+      </div>
 
-      <input type="password" placeholder="Password" [(ngModel)]="password" />
-      <div class="input-warn" *ngIf="errors.password">{{ errors.password }}</div>
+      <input
+        type="password"
+        placeholder="Password"
+        [(ngModel)]="password"
+      />
+      <div class="input-warn" *ngIf="errors.password">
+        {{ errors.password }}
+      </div>
 
-      <button class="primary" style="width:100%" (click)="authenticate()">
+      <button class="primary full" (click)="authenticate()">
         Continue
       </button>
 
       <div class="switch">
-        {{ authMode==='login' ? 'New here?' : 'Already have account?' }}
+        {{ authMode === 'login' ? 'New here?' : 'Already have account?' }}
         <span (click)="switchMode()">Switch</span>
       </div>
     </div>
   </div>
-
 </div>

@@ -7,10 +7,9 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.css']
+  styleUrls: ['./landing.component.css'],
 })
 export class LandingComponent {
-
   isAuthenticated = false;
   showAuth = false;
   authMode: 'login' | 'signup' = 'login';
@@ -20,7 +19,6 @@ export class LandingComponent {
   name = '';
   email = '';
   password = '';
-
   errors: any = {};
 
   timer = 60;
@@ -51,7 +49,7 @@ export class LandingComponent {
       this.errors.password = 'Please enter your password';
     }
 
-    if (Object.keys(this.errors).length > 0) return;
+    if (Object.keys(this.errors).length) return;
 
     this.isAuthenticated = true;
     this.showAuth = false;
@@ -69,6 +67,7 @@ export class LandingComponent {
   startTimer() {
     clearInterval(this.interval);
     this.timer = 60;
+
     this.interval = setInterval(() => {
       this.timer--;
       if (this.timer === 0) clearInterval(this.interval);

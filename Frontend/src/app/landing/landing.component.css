@@ -1,23 +1,28 @@
 :host {
   display: block;
   height: 100vh;
+  width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
+
   font-family: Inter, system-ui, sans-serif;
 
-  --bg-main: #C9F2C7;
-  --bg-surface: #ACECA1;
-  --border-soft: #96BE8C;
+  --bg-main: #c9f2c7;
+  --bg-surface: #aceca1;
+  --border-soft: #96be8c;
   --accent: #629460;
   --text-main: #243119;
 }
 
+/* APP */
 .app {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
+  width: 100%;
   background: var(--bg-main);
   color: var(--text-main);
-  overflow: hidden; /* ✅ SAFE */
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -60,11 +65,17 @@ button {
   padding: 0.6rem 1.6rem;
 }
 
+.primary.full {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
 /* MAIN */
 .main {
   display: grid;
   height: 100%;
-  overflow: hidden; /* ✅ SAFE */
+  width: 100%;
+  overflow: hidden;
 }
 
 .main.center {
@@ -90,6 +101,8 @@ button {
 .hero {
   display: grid;
   place-items: center;
+  width: 100%;
+  overflow: hidden;
 }
 
 .hero.shift-left {
@@ -123,11 +136,12 @@ button {
 
 /* AUTH */
 .auth-card {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(0,0,0,0.08);
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .auth-box {
@@ -136,6 +150,34 @@ button {
   border: 1px solid var(--border-soft);
   padding: 2rem;
   border-radius: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 0.65rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border-soft);
+}
+
+.input-warn {
+  font-size: 0.75rem;
+  color: #7a2d2d;
+  margin-bottom: 0.4rem;
+}
+
+/* SWITCH */
+.switch {
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+  text-align: center;
+}
+
+.switch span {
+  color: var(--accent);
+  cursor: pointer;
 }
 
 /* AVATAR */
