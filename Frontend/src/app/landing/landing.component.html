@@ -2,7 +2,7 @@
 
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">TYPE•AI</div>
+    <div class="logo" (click)="goHome()">TYPE•AI</div>
 
     <div class="actions">
       <ng-container *ngIf="!isAuthenticated; else user">
@@ -22,7 +22,13 @@
   </header>
 
   <!-- MAIN -->
-  <section class="main">
+  <section
+    class="main"
+    [ngClass]="{
+      'center': !showAuth && !isAuthenticated,
+      'with-panel': showAuth || isAuthenticated
+    }"
+  >
 
     <aside class="panel" *ngIf="isAuthenticated">
       <h4>Session</h4>

@@ -29,6 +29,7 @@ export class LandingComponent {
   openAuth(mode: 'login' | 'signup') {
     this.authMode = mode;
     this.showAuth = true;
+    this.showWarn = false;
     this.errors = {};
   }
 
@@ -81,5 +82,13 @@ export class LandingComponent {
   logout() {
     this.isAuthenticated = false;
     this.menuOpen = false;
+    this.goHome();
+  }
+
+  goHome() {
+    this.showAuth = false;
+    this.showWarn = false;
+    clearInterval(this.interval);
+    this.timer = 60;
   }
 }
