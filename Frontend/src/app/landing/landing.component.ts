@@ -90,4 +90,6 @@ export class LandingComponent {
     clearInterval(this.interval);
     this.timer = 60;
   }
+  forgotPassword(){}
+  continueAsGuest(){}
 }

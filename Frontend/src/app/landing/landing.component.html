@@ -1,21 +1,13 @@
 <div class="app">
-  <!-- HEADER (UNCHANGED STRUCTURE) -->
+
+  <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
 
     <div class="actions">
-      <ng-container *ngIf="!isAuthenticated; else user">
-        <button class="primary" (click)="openAuth('login')">Login</button>
-      </ng-container>
-
-      <ng-template #user>
-        <div class="avatar">
-          <img src="https://i.pravatar.cc/60" (click)="toggleMenu()" />
-          <div class="menu" *ngIf="menuOpen">
-            <button (click)="logout()">Logout</button>
-          </div>
-        </div>
-      </ng-template>
+      <button class="login-btn" (click)="openAuth('login')">
+        Login
+      </button>
     </div>
   </header>
 
@@ -31,42 +23,61 @@
         <button class="primary" (click)="startTyping()">
           Start Typing
         </button>
-
-        <div class="warn" *ngIf="showWarn">
-          Please login to continue
-        </div>
       </div>
     </div>
 
     <!-- AUTH PANEL (RIGHT SIDE COMPONENT) -->
     <aside class="auth-panel" *ngIf="showAuth">
-      <h2>{{ authMode === 'login' ? 'Login' : 'Create account' }}</h2>
-
-      <ng-container *ngIf="authMode === 'signup'">
-        <label>Name</label>
-        <input placeholder="Your name" [(ngModel)]="name" />
-        <div class="input-warn" *ngIf="errors.name">{{ errors.name }}</div>
-      </ng-container>
-
-      <label>Email</label>
-      <input placeholder="Email" [(ngModel)]="email" />
-      <div class="input-warn" *ngIf="errors.email">{{ errors.email }}</div>
-
-      <label>Password</label>
-      <input type="password" placeholder="Password" [(ngModel)]="password" />
-      <div class="input-warn" *ngIf="errors.password">
-        {{ errors.password }}
+      <div class="tabs">
+        <span
+          [class.active]="authMode === 'login'"
+          (click)="authMode = 'login'"
+        >
+          Login
+        </span>
+        <span
+          [class.active]="authMode === 'signup'"
+          (click)="authMode = 'signup'"
+        >
+          Sign Up
+        </span>
       </div>
 
+      <label>Email</label>
+      <input
+        type="email"
+        placeholder="Email"
+        [(ngModel)]="email"
+      />
+
+      <label>Password</label>
+      <input
+        type="password"
+        placeholder="Password"
+        [(ngModel)]="password"
+      />
+
+      
+        
+      
+
       <button class="primary full" (click)="authenticate()">
-        Continue
+        {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
       </button>
 
-      <div class="switch">
-        {{ authMode === 'login' ? 'New here?' : 'Already have account?' }}
-        <span (click)="switchMode()">Switch</span>
+      <div class="links">
+        <span (click)="forgotPassword()">Forgot Password?</span>
+        <span (click)="continueAsGuest()">Continue as Guest</span>
       </div>
     </aside>
 
   </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>Privacy Policy</span>
+    <span>Terms of Service</span>
+    <span>Support</span>
+  </footer>
+
 </div>
