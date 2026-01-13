@@ -7,12 +7,14 @@
 
   font-family: Inter, system-ui, sans-serif;
 
-  --bg-main: #c9f2c7;
-  --bg-surface: #aceca1;
-  --border-soft: #96be8c;
-  --accent: #629460;
-  --text-main: #243119;
+  /* NEW COLOR THEME (Client Approved) */
+  --bg-main: #F0EBD8;
+  --bg-surface: #748CAB;
+  --border-soft: #3E5C76;
+  --accent: #1D2D44;
+  --text-main: #0D1321;
 }
+
 
 
 /* APP */
