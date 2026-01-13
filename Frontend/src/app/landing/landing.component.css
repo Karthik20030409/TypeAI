@@ -7,25 +7,21 @@
 
   font-family: Inter, system-ui, sans-serif;
 
-  /* NEW COLOR THEME (Client Approved) */
-  --bg-main: #F0EBD8;
-  --bg-surface: #748CAB;
+  /* THEME */
+  --bg-main: #F3EDD9;
+  --bg-surface: #7D93B2;
   --border-soft: #3E5C76;
   --accent: #1D2D44;
   --text-main: #0D1321;
 }
-
-
 
 /* APP */
 .app {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
-  width: 100%;
   background: var(--bg-main);
   color: var(--text-main);
-  overflow: hidden;
 }
 
 /* HEADER */
@@ -39,8 +35,8 @@
 }
 
 .logo {
-  font-weight: 900;
   font-size: 1.4rem;
+  font-weight: 900;
   cursor: pointer;
 }
 
@@ -49,86 +45,66 @@
   gap: 1rem;
 }
 
+/* BUTTONS */
 button {
-  border-radius: 999px;
   border: none;
-  cursor: pointer;
+  border-radius: 999px;
   font-weight: 600;
-}
-
-.ghost {
-  background: transparent;
-  border: 1px solid var(--border-soft);
-  padding: 0.45rem 1.2rem;
+  cursor: pointer;
 }
 
 .primary {
   background: var(--accent);
-  color: white;
+  color: #fff;
   padding: 0.6rem 1.6rem;
 }
 
 .primary.full {
   width: 100%;
-  margin-top: 0.6rem;
+  margin-top: 0.8rem;
 }
 
 /* MAIN */
 .main {
-  display: grid;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+  display: flex;
+  height: calc(100vh - 70px);
+  background: linear-gradient(
+    130deg,
+    var(--bg-main) 0%,
+    var(--bg-main) 62%,
+    #DBE3EE 62%,
+    #9BB0C9 100%
+  );
 }
 
-.main.center {
-  grid-template-columns: 1fr;
-}
-
-.main.with-panel {
-  grid-template-columns: 260px 1fr;
-}
-
-.panel {
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-soft);
-  padding: 1.5rem;
-}
-
-.timer {
-  font-size: 2rem;
-  font-weight: 800;
-}
 
 /* HERO */
 .hero {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  overflow: hidden;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+
+  /* keep position stable */
+  padding-left: 10rem;
+  padding-right: 4rem;
+  
 }
 
-.hero.shift-left {
-  place-items: start center;
-  padding-left: 4rem;
-}
 
 .hero-inner {
-  text-align: center;
   max-width: 520px;
 }
 
-.hero.shift-left .hero-inner {
-  text-align: left;
-}
+
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.4rem;
   font-weight: 900;
 }
 
 .hero p {
-  margin: 1rem 0 1.8rem;
+  margin: 1.2rem 0 2rem;
 }
 
 .warn {
@@ -137,50 +113,66 @@ button {
   color: #7a2d2d;
 }
 
-/* AUTH */
-.auth-card {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
+/* AUTH PANEL */
+.auth-panel {
+  width: 380px;
+  flex-shrink: 0;
 
-.auth-box {
-  width: 340px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  padding: 2rem;
-  border-radius: 1.2rem;
+  margin: auto 4rem auto auto;
+  padding: 2.5rem;
+
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(18px);
+
+  border-radius: 1.4rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
-.auth-box input {
-  width: 100%;
-  padding: 0.65rem;
-  margin-bottom: 0.5rem;
+.auth-panel h2 {
+  margin-bottom: 1.5rem;
+}
+
+.auth-panel label {
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.auth-panel input {
+  padding: 0.75rem;
+  margin-bottom: 0.8rem;
   border-radius: 0.6rem;
   border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-main);
 }
 
+.auth-panel input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* WARNINGS */
 .input-warn {
   font-size: 0.75rem;
   color: #7a2d2d;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 /* SWITCH */
 .switch {
+  margin-top: 1rem;
   font-size: 0.85rem;
-  margin-top: 0.8rem;
   text-align: center;
 }
 
 .switch span {
   color: var(--accent);
   cursor: pointer;
+  margin-left: 4px;
 }
 
 /* AVATAR */
@@ -197,8 +189,8 @@ button {
 
 .menu {
   position: absolute;
-  right: 0;
   top: 42px;
+  right: 0;
   background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: 0.6rem;

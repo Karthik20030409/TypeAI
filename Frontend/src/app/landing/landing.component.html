@@ -1,12 +1,11 @@
 <div class="app">
-  <!-- HEADER -->
+  <!-- HEADER (UNCHANGED STRUCTURE) -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
 
     <div class="actions">
       <ng-container *ngIf="!isAuthenticated; else user">
-        <button class="ghost" (click)="openAuth('login')">Login</button>
-        <button class="primary" (click)="openAuth('signup')">Sign up</button>
+        <button class="primary" (click)="openAuth('login')">Login</button>
       </ng-container>
 
       <ng-template #user>
@@ -21,19 +20,10 @@
   </header>
 
   <!-- MAIN -->
-  <section
-    class="main"
-    [ngClass]="{
-      center: !showAuth && !isAuthenticated,
-      'with-panel': showAuth || isAuthenticated
-    }"
-  >
-    <aside class="panel" *ngIf="isAuthenticated">
-      <h4>Session</h4>
-      <div class="timer">{{ timer }}s</div>
-    </aside>
+  <section class="main">
 
-    <div class="hero" [class.shift-left]="showAuth">
+    <!-- HERO -->
+    <div class="hero">
       <div class="hero-inner">
         <h1>Speed is intelligence</h1>
         <p>Measure real typing performance.</p>
@@ -43,34 +33,27 @@
         </button>
 
         <div class="warn" *ngIf="showWarn">
-          Please login or signup to continue
+          Please login to continue
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- AUTH -->
-  <div class="auth-card" *ngIf="showAuth">
-    <div class="auth-box">
+    <!-- AUTH PANEL (RIGHT SIDE COMPONENT) -->
+    <aside class="auth-panel" *ngIf="showAuth">
       <h2>{{ authMode === 'login' ? 'Login' : 'Create account' }}</h2>
 
       <ng-container *ngIf="authMode === 'signup'">
-        <input placeholder="Name" [(ngModel)]="name" />
-        <div class="input-warn" *ngIf="errors.name">
-          {{ errors.name }}
-        </div>
+        <label>Name</label>
+        <input placeholder="Your name" [(ngModel)]="name" />
+        <div class="input-warn" *ngIf="errors.name">{{ errors.name }}</div>
       </ng-container>
 
+      <label>Email</label>
       <input placeholder="Email" [(ngModel)]="email" />
-      <div class="input-warn" *ngIf="errors.email">
-        {{ errors.email }}
-      </div>
+      <div class="input-warn" *ngIf="errors.email">{{ errors.email }}</div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        [(ngModel)]="password"
-      />
+      <label>Password</label>
+      <input type="password" placeholder="Password" [(ngModel)]="password" />
       <div class="input-warn" *ngIf="errors.password">
         {{ errors.password }}
       </div>
@@ -83,6 +66,7 @@
         {{ authMode === 'login' ? 'New here?' : 'Already have account?' }}
         <span (click)="switchMode()">Switch</span>
       </div>
-    </div>
-  </div>
+    </aside>
+
+  </section>
 </div>
