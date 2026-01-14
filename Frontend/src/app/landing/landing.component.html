@@ -5,9 +5,11 @@
     <div class="logo" (click)="goHome()">TYPE•AI</div>
 
     <div class="actions">
-      <button class="login-btn" (click)="openAuth('login')">
-        Login
-      </button>
+      <div class="nav-actions">
+        <i class="pi pi-bell nav-icon"></i>
+        <i class="pi pi-user nav-icon"></i>
+        <i class="pi pi-cog nav-icon"></i>
+      </div>
     </div>
   </header>
 
@@ -17,51 +19,53 @@
     <!-- HERO -->
     <div class="hero">
       <div class="hero-inner">
-        <h1>Speed is intelligence</h1>
-        <p>Measure real typing performance.</p>
+        <h1 class="hero-title">
+          Speed is <span>intelligence</span>
+        </h1>
+        <p class="hero-subtitle">
+          Measure real typing performance with ease.
+        </p>
 
-        <button class="primary" (click)="startTyping()">
-          Start Typing
-        </button>
+        <!-- Catchy dynamic text -->
+        <p class="hero-highlight">
+          ⏰ Boost your <strong>accuracy</strong> & <strong>speed</strong> every day! ✨
+        </p>
+
+        <!-- Feature list -->
+        <p class="typing-effect">
+          {{ typingText }}<span class="cursor"></span>
+        </p>
+        <button class="primary btn-animated" (click)="startTyping()">Start Typing</button>
+
+        <!-- Optional typing hint animation -->
+
+        <!-- Floating illustration placeholder -->
+
       </div>
     </div>
 
     <!-- AUTH PANEL (RIGHT SIDE COMPONENT) -->
-    <aside class="auth-panel" *ngIf="showAuth">
+    <aside class="auth-panel">
       <div class="tabs">
-        <span
-          [class.active]="authMode === 'login'"
-          (click)="authMode = 'login'"
-        >
+        <span [class.active]="authMode === 'login'" (click)="authMode = 'login'">
           Login
         </span>
-        <span
-          [class.active]="authMode === 'signup'"
-          (click)="authMode = 'signup'"
-        >
+        <span [class.active]="authMode === 'signup'" (click)="authMode = 'signup'">
           Sign Up
         </span>
       </div>
 
       <label>Email</label>
-      <input
-        type="email"
-        placeholder="Email"
-        [(ngModel)]="email"
-      />
+      <input type="email" placeholder="Email" [(ngModel)]="email" />
 
       <label>Password</label>
-      <input
-        type="password"
-        placeholder="Password"
-        [(ngModel)]="password"
-      />
+      <input type="password" placeholder="Password" [(ngModel)]="password" />
 
-      
-        
-      
 
-      <button class="primary full" (click)="authenticate()">
+
+
+
+      <button class="primary btn-animated login" (click)="authenticate()">
         {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
       </button>
 
@@ -74,10 +78,6 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
-    <span>Privacy Policy</span>
-    <span>Terms of Service</span>
-    <span>Support</span>
-  </footer>
+ 
 
 </div>

@@ -21,13 +21,31 @@
 .header {
   height: 70px;
   padding: 0 3rem;
-  background: var(--bg-header);
+  background: linear-gradient(135deg, #8dacd8 0%, #f0ebd8 80%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 10; 
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  cursor: pointer;
+  color:  #0d1321;
+  transition: color 0.2s ease;
+}
+
+.nav-icon:hover {
+  color:#f0ebd8;
 }
 
 .logo {
+  color:  #0d1321; ;
   font-size: 1.3rem;
   font-weight: 900;
   cursor: pointer;
@@ -49,10 +67,10 @@
   position: relative;
   padding: 3rem;
   background: linear-gradient(
-    135deg,
-    #f6f1e3 0%,
+   135deg,
+    #8dacd8 0%,
     #f0ebd8 55%,
-    #d5e0ef 100%
+    #f0ebd8 100%
   );
   overflow: hidden;
 }
@@ -76,39 +94,119 @@
   display: flex;
   align-items: center;
   justify-content: left;
-    padding-left: 10rem;
+  padding-left: 10rem;
   padding-right: 4rem;
   z-index: 1;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px);
+  border-start-start-radius: 1.6rem;
+  /* border-bottom-left-radius: 1.6rem; */
+  
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  /* box-shadow: 0 0px 60px rgba(0, 0, 0, 0.25); */
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-inner {
   max-width: 520px;
   text-align: center;
+  animation: fadeIn 1.2s ease forwards;
+}
+.hero-highlight {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  color: #f6a06f; /* pastel highlight */
 }
 
-.hero h1 {
+
+
+
+
+.hero-title {
   font-size: 3rem;
   font-weight: 900;
+  margin-bottom: 1rem;
+}
+.hero-title span {
+ background: linear-gradient(90deg, #f6d365, #fda085);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  animation: gradientShift 3s infinite alternate;
 }
 
-.hero p {
-  margin: 1rem 0 2rem;
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  opacity: 0.85;
 }
 
 /* PRIMARY BUTTON */
-.primary {
-  background: var(--accent);
-  color: #fff;
+.primary.btn-animated {
+  background: #f6d365; 
+  color: #2575fc;
   border: none;
-  padding: 0.75rem 2.2rem;
-  border-radius: 999px;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
   font-weight: 600;
+  border-radius: 50px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  
 }
-
-.primary.full {
+.primary.btn-animated.login{
   width: 100%;
 }
+
+.primary.btn-animated:hover {
+  transform: scale(1.05);
+   box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.typing-effect {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 1.5rem 0;
+  font-weight: 500;
+  min-height: 1.5em; /* prevents layout shift */
+}
+
+
+.cursor {
+  display: inline-block;
+  background-color: #555;
+  width: 2px;
+  animation: blink 0.8s infinite;
+  margin-left: 2px;
+}
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+@keyframes float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-15px); }
+}
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
 
 /* AUTH PANEL */
 .auth-panel {
@@ -117,10 +215,10 @@
   padding: 2.5rem;
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(18px);
-  border-radius: 1.6rem;
+  border-start-end-radius: 1.6rem;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  z-index: 2;
+  /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
+  
 }
 
 /* TABS */
@@ -128,6 +226,7 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
 .tabs span {
@@ -172,13 +271,4 @@
 }
 
 /* FOOTER */
-.footer {
-  height: 40px;
-  background: var(--bg-footer);
-  color: #e2e2e2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3rem;
-  font-size: 0.8rem;
-}
+
