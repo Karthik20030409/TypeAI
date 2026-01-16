@@ -305,3 +305,69 @@
   padding: 0.4rem 0.6rem;
   cursor: pointer;
 }
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  background-color: #f0fdf4; /* light green bg for success */
+  color: #166534; /* dark green text */
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  animation: slideIn 0.4s ease;
+  z-index: 9999;
+}
+
+.toast-notification.error {
+  background-color: #fef2f2; /* light red */
+  color: #991b1b; /* dark red */
+}
+
+.toast-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast-icon {
+  font-size: 1.4rem;
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.toast-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.toast-message {
+  font-size: 0.9rem;
+}
+
+.toast-close {
+  font-size: 1.2rem;
+  line-height: 1;
+  padding-left: 12px;
+  cursor: pointer;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

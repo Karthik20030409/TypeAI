@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class LandingComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   authMode: 'login' | 'signup' | 'forgot' = 'login';
   isAuthenticated = false;
@@ -37,6 +37,12 @@ export class LandingComponent implements OnInit {
   ];
   phraseIndex = 0;
   charIndex = 0;
+  toast = {
+    show: false,
+    message: '',
+    type: 'success' // or 'error'
+  };
+
 
   ngOnInit() {
     this.typeText();
@@ -52,19 +58,49 @@ export class LandingComponent implements OnInit {
 
   authenticate() {
     this.isAuthenticated = true;
-    this.successMessage = 'Logged in successfully ✅';
+    this.showToast(
+      this.authMode === 'login'
+        ? 'Logged in successfully'
+        : 'Account created successfully'
+    );
+
+  }
+  showToast(message: string, type: 'success' | 'error' = 'success') {
+    this.toast.message = message;
+    this.toast.type = type;
+    this.toast.show = true;
+    if (this.toast.type == 'success') {
+      setTimeout(() => {
+        this.toast.show = false;
+        this.router.navigate(['/typing']);
+      }, 1000);
+    }
+    if (this.toast.type == 'error') {
+      setTimeout(() => {
+        this.toast.show = false;
+      }, 2000);
+    }
+
   }
 
   continueAsGuest() {
     this.isGuest = true;
+    this.showToast(
+      'Logged in as GUEST'
+    )
   }
 
   startTyping() {
     if (!this.isAuthenticated && !this.isGuest) {
       this.errors.start = 'Please login or continue as guest';
+      this.showToast(
+        'Please login or continue as guest', 'error'
+      )
+
       return;
     }
-    this.router.navigate(['/typing']);
+
+
   }
 
   toggleSettings() {

@@ -41,8 +41,6 @@
           Start Typing
         </button>
 
-        <div class="error" *ngIf="errors.start">{{ errors.start }}</div>
-        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
       </div>
     </div>
 
@@ -81,3 +79,17 @@
 
   </section>
 </div>
+<div class="toast-notification" *ngIf="toast.show" [ngClass]="toast.type" (click)="toast.show = false">
+  <div class="toast-left">
+    <span class="toast-icon">
+      <ng-container *ngIf="toast.type === 'success'">✔️</ng-container>
+      <ng-container *ngIf="toast.type === 'error'">❌</ng-container>
+    </span>
+    <div class="toast-content">
+      <div class="toast-title">{{ toast.type | titlecase }}</div>
+      <div class="toast-message">{{ toast.message }}</div>
+    </div>
+  </div>
+  <span class="toast-close" (click)="toast.show = false">&times;</span>
+</div>
+
