@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+type Page = 'landing' | 'typing';
 
 @Component({
   selector: 'app-landing',
@@ -9,147 +11,212 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css'],
 })
-export class LandingComponent implements OnInit {
-  // --- Authentication & UI state ---
-  isAuthenticated = false;
-  showAuth = false;
-  authMode: 'login' | 'signup' = 'login';
-  showWarn = false;
-  menuOpen = false;
+export class LandingComponent implements OnInit, OnDestroy {
 
+  /* ---------------- PAGE ---------------- */
+  currentPage: Page = 'landing';
+
+  /* ---------------- AUTH ---------------- */
+  authMode: 'login' | 'signup' | 'forgot' = 'login';
+  isAuthenticated = false;
+  isGuest = false;
+
+  /* ---------------- FORM ---------------- */
   name = '';
   email = '';
   password = '';
-  errors: any = {};
+  newPassword = '';
 
+  errors: {
+    name?: string;
+    email?: string;
+    password?: string;
+    start?: string;
+  } = {};
+
+  /* ---------------- TIMER ---------------- */
   timer = 60;
-  interval: any;
+  difficulty: 'easy' | 'medium' | 'hard' = 'easy';
+  private intervalId: number | null = null;
 
-  // --- Typing effect ---
-  typingText = ''; // bind this to template
-  phrases = [
+  /* ---------------- TYPING EFFECT ---------------- */
+  typingText = '';
+  phrases: string[] = [
     'Improve your accuracy ⚡',
     'Boost your typing speed ⏰',
     'Challenge yourself daily 📝',
     'Become a typing pro ✨',
   ];
-  currentPhraseIndex = 0;
-  currentCharIndex = 0;
-  typingSpeed = 100;
-  eraseSpeed = 50;
-  pauseDelay = 1500;
 
-  ngOnInit() {
+  private phraseIndex = 0;
+  private charIndex = 0;
+
+  /* ---------------- LIFECYCLE ---------------- */
+  ngOnInit(): void {
     this.startTypingEffect();
   }
 
-  // ---------------- Authentication methods ----------------
-  openAuth(mode: 'login' | 'signup') {
-    this.authMode = mode;
-    this.showAuth = true;
-    this.showWarn = false;
-    this.errors = {};
+  ngOnDestroy(): void {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+    }
   }
 
-  switchMode() {
-    this.authMode = this.authMode === 'login' ? 'signup' : 'login';
-    this.errors = {};
+  /* ---------------- VALIDATION HELPERS ---------------- */
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  authenticate() {
+  private isValidPassword(password: string): boolean {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
+  }
+
+  /* ---------------- AUTH ---------------- */
+  authenticate(): void {
     this.errors = {};
-    if (this.authMode === 'signup' && !this.name) {
+
+    // Name (signup only)
+    if (this.authMode === 'signup' && !this.name.trim()) {
       this.errors.name = 'Please enter your name';
     }
 
-    /* EMAIL VALIDATION */
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Email
     if (!this.email) {
-      this.errors.email = 'Please enter your email';
-    } else if (!emailRegex.test(this.email)) {
-      this.errors.email = 'Please enter a valid email';
+      this.errors.email = 'Please enter email';
+    } else if (!this.isValidEmail(this.email)) {
+      this.errors.email = 'Invalid email format';
     }
 
-    /* PASSWORD VALIDATION */
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+    // Password
     if (!this.password) {
-      this.errors.password = 'Please enter your password';
-    } else if (!passwordRegex.test(this.password)) {
+      this.errors.password = 'Please enter password';
+    } else if (!this.isValidPassword(this.password)) {
       this.errors.password =
-        'The password must contain at least 1 uppercase, 1 lowercase, 1 special character, 1 number and length must be more than or equal to 8';
+        'Password must be 8+ chars with uppercase, lowercase, number & special character';
     }
-    if (Object.keys(this.errors).length) return;
 
-    this.isAuthenticated = true;
-    this.showAuth = false;
-    this.showWarn = false;
-  }
+    if (Object.keys(this.errors).length > 0) return;
 
-  startTyping() {
-    if (!this.isAuthenticated) {
-      this.showWarn = true;
+    // SIGN UP FLOW
+    if (this.authMode === 'signup') {
+      alert('Account created successfully 🎉');
+      this.authMode = 'login';
+      this.password = '';
       return;
     }
+
+    // LOGIN FLOW
+    this.isAuthenticated = true;
+    this.isGuest = false;
+    alert('Logged in successfully ✅');
+  }
+
+  /* ---------------- START TYPING ---------------- */
+  startTyping(): void {
+    this.errors.start = '';
+
+    if (!this.isAuthenticated && !this.isGuest) {
+      this.errors.start = 'Please login or signup before continuing';
+      return;
+    }
+
+    this.goToTypingPage();
+  }
+
+  private goToTypingPage(): void {
+    this.currentPage = 'typing';
+
+    this.timer =
+      this.difficulty === 'easy'
+        ? 60
+        : this.difficulty === 'medium'
+        ? 45
+        : 30;
+
     this.startTimer();
   }
 
-  startTimer() {
-    clearInterval(this.interval);
-    this.timer = 60;
+  private startTimer(): void {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+    }
 
-    this.interval = setInterval(() => {
+    this.intervalId = window.setInterval(() => {
       this.timer--;
-      if (this.timer === 0) clearInterval(this.interval);
+
+      if (this.timer <= 0 && this.intervalId !== null) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
     }, 1000);
   }
 
-  toggleMenu() {
-    this.menuOpen = !this.menuOpen;
-  }
+  /* ---------------- NAV ---------------- */
+  goHome(): void {
+    this.currentPage = 'landing';
 
-  logout() {
-    this.isAuthenticated = false;
-    this.menuOpen = false;
-    this.goHome();
-  }
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
 
-  goHome() {
-    this.showAuth = false;
-    this.showWarn = false;
-    clearInterval(this.interval);
     this.timer = 60;
   }
 
-  forgotPassword() {}
-  continueAsGuest() {}
-
-  // ---------------- Typing effect methods ----------------
-  startTypingEffect() {
-    this.type();
+  /* ---------------- FORGOT PASSWORD ---------------- */
+  forgotPassword(): void {
+    this.authMode = 'forgot';
+    this.errors = {};
   }
 
-  private type() {
-    const phrase = this.phrases[this.currentPhraseIndex];
-    if (this.currentCharIndex < phrase.length) {
-      this.typingText += phrase[this.currentCharIndex];
-      this.currentCharIndex++;
-      setTimeout(() => this.type(), this.typingSpeed);
+  resetPassword(): void {
+    this.errors = {};
+
+    if (!this.email || !this.isValidEmail(this.email)) {
+      this.errors.email = 'Enter a valid email';
+      return;
+    }
+
+    if (!this.isValidPassword(this.newPassword)) {
+      this.errors.password =
+        'Password must be 8+ chars with uppercase, lowercase, number & special character';
+      return;
+    }
+
+    alert('Password reset successful ✅');
+
+    this.authMode = 'login';
+    this.password = '';
+    this.newPassword = '';
+  }
+
+  /* ---------------- GUEST ---------------- */
+  continueAsGuest(): void {
+    this.isGuest = true;
+    this.isAuthenticated = false;
+    this.goToTypingPage();
+  }
+
+  /* ---------------- TYPING EFFECT ---------------- */
+  private startTypingEffect(): void {
+    const phrase = this.phrases[this.phraseIndex];
+
+    if (this.charIndex < phrase.length) {
+      this.typingText += phrase[this.charIndex++];
+      setTimeout(() => this.startTypingEffect(), 100);
     } else {
-      setTimeout(() => this.erase(), this.pauseDelay);
+      setTimeout(() => this.eraseTyping(), 1500);
     }
   }
 
-  private erase() {
-    if (this.currentCharIndex > 0) {
+  private eraseTyping(): void {
+    if (this.charIndex > 0) {
       this.typingText = this.typingText.slice(0, -1);
-      this.currentCharIndex--;
-      setTimeout(() => this.erase(), this.eraseSpeed);
+      this.charIndex--;
+      setTimeout(() => this.eraseTyping(), 50);
     } else {
-      this.currentPhraseIndex =
-        (this.currentPhraseIndex + 1) % this.phrases.length;
-      setTimeout(() => this.type(), 500);
+      this.phraseIndex = (this.phraseIndex + 1) % this.phrases.length;
+      this.startTypingEffect();
     }
   }
 }

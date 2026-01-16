@@ -1,15 +1,12 @@
-<div class="app">
+<div class="app" *ngIf="currentPage === 'landing'">
 
   <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
-
-    <div class="actions">
-      <div class="nav-actions">
-        <i class="pi pi-bell nav-icon"></i>
-        <i class="pi pi-user nav-icon"></i>
-        <i class="pi pi-cog nav-icon"></i>
-      </div>
+    <div class="nav-actions">
+      <i class="pi pi-bell nav-icon"></i>
+      <i class="pi pi-user nav-icon"></i>
+      <i class="pi pi-cog nav-icon"></i>
     </div>
   </header>
 
@@ -19,53 +16,59 @@
     <!-- HERO -->
     <div class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">
-          Speed is <span>intelligence</span>
-        </h1>
-        <p class="hero-subtitle">
-          Measure real typing performance with ease.
-        </p>
+        <h1 class="hero-title">Speed is <span>intelligence</span></h1>
+        <p class="hero-subtitle">Measure real typing performance with ease.</p>
 
-        <!-- Catchy dynamic text -->
-        <p class="hero-highlight">
-          ⏰ Boost your <strong>accuracy</strong> & <strong>speed</strong> every day! ✨
-        </p>
-
-        <!-- Feature list -->
         <p class="typing-effect">
           {{ typingText }}<span class="cursor"></span>
         </p>
-        <button class="primary btn-animated" (click)="startTyping()">Start Typing</button>
 
-        <!-- Optional typing hint animation -->
+        <button class="primary btn-animated" (click)="startTyping()">
+          Start Typing
+        </button>
 
-        <!-- Floating illustration placeholder -->
-
+        <div class="error" *ngIf="errors.start">{{ errors.start }}</div>
       </div>
     </div>
 
-    <!-- AUTH PANEL (RIGHT SIDE COMPONENT) -->
+    <!-- AUTH -->
     <aside class="auth-panel">
+
       <div class="tabs">
-        <span [class.active]="authMode === 'login'" (click)="authMode = 'login'">
-          Login
-        </span>
-        <span [class.active]="authMode === 'signup'" (click)="authMode = 'signup'">
-          Sign Up
-        </span>
+        <span [class.active]="authMode==='login'" (click)="authMode='login'">Login</span>
+        <span [class.active]="authMode==='signup'" (click)="authMode='signup'">Sign Up</span>
       </div>
 
+      <!-- NAME -->
+      <div *ngIf="authMode==='signup'">
+        <label>Name</label>
+        <input [(ngModel)]="name" />
+        <div class="error" *ngIf="errors.name">{{ errors.name }}</div>
+      </div>
+
+      <!-- EMAIL -->
       <label>Email</label>
-      <input type="email" placeholder="Email" [(ngModel)]="email" />
+      <input [(ngModel)]="email" />
+      <div class="error" *ngIf="errors.email">{{ errors.email }}</div>
 
-      <label>Password</label>
-      <input type="password" placeholder="Password" [(ngModel)]="password" />
+      <!-- PASSWORD -->
+      <label *ngIf="authMode!=='forgot'">Password</label>
+      <input *ngIf="authMode!=='forgot'" type="password" [(ngModel)]="password" />
+      <div class="error" *ngIf="errors.password">{{ errors.password }}</div>
 
+      <!-- RESET PASSWORD -->
+      <div *ngIf="authMode==='forgot'">
+        <label>New Password</label>
+        <input type="password" [(ngModel)]="newPassword" />
+        <button class="primary btn-animated login" (click)="resetPassword()">
+          Reset Password
+        </button>
+      </div>
 
-
-
-
-      <button class="primary btn-animated login" (click)="authenticate()">
+      <!-- ACTION -->
+      <button *ngIf="authMode!=='forgot'"
+        class="primary btn-animated login"
+        (click)="authenticate()">
         {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
       </button>
 
@@ -73,11 +76,8 @@
         <span (click)="forgotPassword()">Forgot Password?</span>
         <span (click)="continueAsGuest()">Continue as Guest</span>
       </div>
+
     </aside>
 
   </section>
-
-  <!-- FOOTER -->
- 
-
 </div>
