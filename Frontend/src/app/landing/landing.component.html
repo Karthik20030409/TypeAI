@@ -1,88 +1,83 @@
 <div class="app">
+
   <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
 
     <div class="actions">
-      <ng-container *ngIf="!isAuthenticated; else user">
-        <button class="ghost" (click)="openAuth('login')">Login</button>
-        <button class="primary" (click)="openAuth('signup')">Sign up</button>
-      </ng-container>
-
-      <ng-template #user>
-        <div class="avatar">
-          <img src="https://i.pravatar.cc/60" (click)="toggleMenu()" />
-          <div class="menu" *ngIf="menuOpen">
-            <button (click)="logout()">Logout</button>
-          </div>
-        </div>
-      </ng-template>
+      <div class="nav-actions">
+        <i class="pi pi-bell nav-icon"></i>
+        <i class="pi pi-user nav-icon"></i>
+        <i class="pi pi-cog nav-icon"></i>
+      </div>
     </div>
   </header>
 
   <!-- MAIN -->
-  <section
-    class="main"
-    [ngClass]="{
-      center: !showAuth && !isAuthenticated,
-      'with-panel': showAuth || isAuthenticated
-    }"
-  >
-    <aside class="panel" *ngIf="isAuthenticated">
-      <h4>Session</h4>
-      <div class="timer">{{ timer }}s</div>
-    </aside>
+  <section class="main">
 
-    <div class="hero" [class.shift-left]="showAuth">
+    <!-- HERO -->
+    <div class="hero">
       <div class="hero-inner">
-        <h1>Speed is intelligence</h1>
-        <p>Measure real typing performance.</p>
+        <h1 class="hero-title">
+          Speed is <span>intelligence</span>
+        </h1>
+        <p class="hero-subtitle">
+          Measure real typing performance with ease.
+        </p>
 
-        <button class="primary" (click)="startTyping()">
-          Start Typing
-        </button>
+        <!-- Catchy dynamic text -->
+        <p class="hero-highlight">
+          ⏰ Boost your <strong>accuracy</strong> & <strong>speed</strong> every day! ✨
+        </p>
 
-        <div class="warn" *ngIf="showWarn">
-          Please login or signup to continue
-        </div>
+        <!-- Feature list -->
+        <p class="typing-effect">
+          {{ typingText }}<span class="cursor"></span>
+        </p>
+        <button class="primary btn-animated" (click)="startTyping()">Start Typing</button>
+
+        <!-- Optional typing hint animation -->
+
+        <!-- Floating illustration placeholder -->
+
       </div>
     </div>
-  </section>
 
-  <!-- AUTH -->
-  <div class="auth-card" *ngIf="showAuth">
-    <div class="auth-box">
-      <h2>{{ authMode === 'login' ? 'Login' : 'Create account' }}</h2>
-
-      <ng-container *ngIf="authMode === 'signup'">
-        <input placeholder="Name" [(ngModel)]="name" />
-        <div class="input-warn" *ngIf="errors.name">
-          {{ errors.name }}
-        </div>
-      </ng-container>
-
-      <input placeholder="Email" [(ngModel)]="email" />
-      <div class="input-warn" *ngIf="errors.email">
-        {{ errors.email }}
+    <!-- AUTH PANEL (RIGHT SIDE COMPONENT) -->
+    <aside class="auth-panel">
+      <div class="tabs">
+        <span [class.active]="authMode === 'login'" (click)="authMode = 'login'">
+          Login
+        </span>
+        <span [class.active]="authMode === 'signup'" (click)="authMode = 'signup'">
+          Sign Up
+        </span>
       </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        [(ngModel)]="password"
-      />
-      <div class="input-warn" *ngIf="errors.password">
-        {{ errors.password }}
-      </div>
+      <label>Email</label>
+      <input type="email" placeholder="Email" [(ngModel)]="email" />
 
-      <button class="primary full" (click)="authenticate()">
-        Continue
+      <label>Password</label>
+      <input type="password" placeholder="Password" [(ngModel)]="password" />
+
+
+
+
+
+      <button class="primary btn-animated login" (click)="authenticate()">
+        {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
       </button>
 
-      <div class="switch">
-        {{ authMode === 'login' ? 'New here?' : 'Already have account?' }}
-        <span (click)="switchMode()">Switch</span>
+      <div class="links">
+        <span (click)="forgotPassword()">Forgot Password?</span>
+        <span (click)="continueAsGuest()">Continue as Guest</span>
       </div>
-    </div>
-  </div>
+    </aside>
+
+  </section>
+
+  <!-- FOOTER -->
+ 
+
 </div>
