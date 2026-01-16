@@ -1,0 +1,26 @@
+<div class="typing-app">
+
+  <!-- LEFT -->
+  <aside class="info-panel">
+    <h2>Speed is <span>intelligence</span></h2>
+    <p>Measure real typing performance with ease.</p>
+
+    <div class="timer">⏱ {{ timeLeft }}s</div>
+  </aside>
+
+  <!-- RIGHT -->
+  <section class="typing-panel">
+    <div class="sentence">
+      <span
+        *ngFor="let l of letters"
+        [class.pending]="l.status==='pending'"
+        [class.correct]="l.status==='correct'"
+        [class.wrong]="l.status==='wrong'">
+        {{ l.char }}
+      </span>
+    </div>
+
+    <p class="hint">Start typing to begin</p>
+  </section>
+
+</div>

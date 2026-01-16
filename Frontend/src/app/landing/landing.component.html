@@ -1,31 +1,26 @@
-<div class="app" *ngIf="currentPage === 'landing'">
+<div class="app">
 
   <!-- HEADER -->
   <header class="header">
-    <div class="logo" (click)="goHome()">TYPE•AI</div>
+    <div class="logo">TYPE•AI</div>
 
     <div class="nav-actions">
-
-      <!-- NOTIFICATIONS -->
       <i class="pi pi-bell nav-icon">
         <span class="badge" *ngIf="notifications">
           {{ notifications > 9 ? '9+' : notifications }}
         </span>
       </i>
 
-      <!-- PROFILE -->
       <i class="pi pi-user nav-icon profile">
         <span class="avatar">{{ userInitials }}</span>
       </i>
 
-      <!-- SETTINGS -->
       <i class="pi pi-cog nav-icon" (click)="toggleSettings()"></i>
 
       <div class="settings-menu" *ngIf="showSettings">
         <span (click)="clearNotifications()">Clear Notifications</span>
         <span (click)="logout()">Logout</span>
       </div>
-
     </div>
   </header>
 
@@ -51,7 +46,7 @@
       </div>
     </div>
 
-    <!-- AUTH (HIDDEN AFTER LOGIN) -->
+    <!-- AUTH -->
     <aside class="auth-panel" *ngIf="!isAuthenticated && !isGuest">
 
       <div class="tabs">
@@ -59,36 +54,21 @@
         <span [class.active]="authMode==='signup'" (click)="authMode='signup'">Sign Up</span>
       </div>
 
-      <!-- NAME -->
       <div *ngIf="authMode==='signup'">
         <label>Name</label>
         <input [(ngModel)]="name" />
-        <div class="error" *ngIf="errors.name">{{ errors.name }}</div>
+        <div class="error">{{ errors.name }}</div>
       </div>
 
-      <!-- EMAIL -->
       <label>Email</label>
       <input [(ngModel)]="email" />
-      <div class="error" *ngIf="errors.email">{{ errors.email }}</div>
+      <div class="error">{{ errors.email }}</div>
 
-      <!-- PASSWORD -->
-      <label *ngIf="authMode!=='forgot'">Password</label>
-      <input *ngIf="authMode!=='forgot'" type="password" [(ngModel)]="password" />
-      <div class="error" *ngIf="errors.password">{{ errors.password }}</div>
+      <label>Password</label>
+      <input type="password" [(ngModel)]="password" />
+      <div class="error">{{ errors.password }}</div>
 
-      <!-- FORGOT PASSWORD -->
-      <div *ngIf="authMode==='forgot'">
-        <label>New Password</label>
-        <input type="password" [(ngModel)]="newPassword" />
-        <button class="primary btn-animated login" (click)="resetPassword()">
-          Reset Password
-        </button>
-      </div>
-
-      <!-- ACTION -->
-      <button *ngIf="authMode!=='forgot'"
-        class="primary btn-animated login"
-        (click)="authenticate()">
+      <button class="primary btn-animated login" (click)="authenticate()">
         {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
       </button>
 

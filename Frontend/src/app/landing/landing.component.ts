@@ -1,14 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-type Page = 'landing' | 'typing';
-
-interface User {
-  name: string;
-  email: string;
-  password: string;
-}
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
@@ -17,17 +10,14 @@ interface User {
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css'],
 })
-export class LandingComponent implements OnInit, OnDestroy {
+export class LandingComponent implements OnInit {
 
-  /* ---------- PAGE ---------- */
-  currentPage: Page = 'landing';
+  constructor(private router: Router) {}
 
-  /* ---------- AUTH ---------- */
   authMode: 'login' | 'signup' | 'forgot' = 'login';
   isAuthenticated = false;
   isGuest = false;
 
-  /* ---------- FORM ---------- */
   name = '';
   email = '';
   password = '';
@@ -36,21 +26,9 @@ export class LandingComponent implements OnInit, OnDestroy {
   errors: any = {};
   successMessage = '';
 
-  /* ---------- USER STORAGE (DEMO) ---------- */
-  private registeredUser: User | null = null;
-
-  /* ---------- HEADER ---------- */
   notifications = 3;
   showSettings = false;
 
-  get userInitials(): string {
-    if (this.isGuest) return 'G';
-    return this.name
-      ? this.name.charAt(0).toUpperCase()
-      : this.email.charAt(0).toUpperCase();
-  }
-
-  /* ---------- TYPING EFFECT ---------- */
   typingText = '';
   phrases = [
     'Improve your accuracy ⚡',
@@ -64,138 +42,31 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.typeText();
   }
 
-  ngOnDestroy() {}
-
-  /* ---------- VALIDATION ---------- */
-  isValidEmail(email: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  get userInitials(): string {
+    return this.isGuest ? 'G' : (this.name || this.email)[0]?.toUpperCase();
   }
 
-  isValidPassword(password: string) {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
-  }
-
-  /* ---------- AUTH ---------- */
-  authenticate() {
-    this.errors = {};
-    this.successMessage = '';
-
-    /* SIGN UP */
-    if (this.authMode === 'signup') {
-      if (!this.name.trim()) {
-        this.errors.name = 'Please enter your name';
-        return;
-      }
-
-      if (!this.email || !this.isValidEmail(this.email)) {
-        this.errors.email = 'Enter valid email';
-        return;
-      }
-
-      if (!this.password || !this.isValidPassword(this.password)) {
-        this.errors.password =
-          'Password must be 8+ chars with uppercase, lowercase, number & special character';
-        return;
-      }
-
-      this.registeredUser = {
-        name: this.name.trim(),
-        email: this.email.trim(),
-        password: this.password,
-      };
-
-      this.successMessage = 'Account created successfully 🎉 Please log in.';
-      this.authMode = 'login';
-      this.password = '';
-      return;
-    }
-
-    /* LOGIN */
-    if (!this.email || !this.isValidEmail(this.email)) {
-      this.errors.email = 'Enter valid email';
-      return;
-    }
-
-    if (!this.password) {
-      this.errors.password = 'Please enter password';
-      return;
-    }
-
-    if (!this.registeredUser) {
-      this.errors.email = 'No account found. Please sign up first';
-      return;
-    }
-
-    if (this.email !== this.registeredUser.email) {
-      this.errors.email = 'Email not registered';
-      return;
-    }
-
-    if (this.password !== this.registeredUser.password) {
-      this.errors.password = 'Wrong password. Please enter the correct password';
-      return;
-    }
-
-    this.isAuthenticated = true;
-    this.name = this.registeredUser.name;
-    this.successMessage = 'Logged in successfully ✅';
-  }
-
-  /* ---------- FORGOT PASSWORD ---------- */
   forgotPassword() {
-    this.errors = {};
-    this.successMessage = '';
     this.authMode = 'forgot';
   }
 
-  resetPassword() {
-    this.errors = {};
-    this.successMessage = '';
-
-    if (!this.email || !this.isValidEmail(this.email)) {
-      this.errors.email = 'Enter valid email';
-      return;
-    }
-
-    if (!this.registeredUser || this.email !== this.registeredUser.email) {
-      this.errors.email = 'Email not registered';
-      return;
-    }
-
-    if (!this.isValidPassword(this.newPassword)) {
-      this.errors.password =
-        'Password must be 8+ chars with uppercase, lowercase, number & special character';
-      return;
-    }
-
-    this.registeredUser.password = this.newPassword;
-    this.newPassword = '';
-    this.authMode = 'login';
-    this.successMessage = 'Password reset successful ✅ Please log in';
+  authenticate() {
+    this.isAuthenticated = true;
+    this.successMessage = 'Logged in successfully ✅';
   }
 
-  /* ---------- GUEST ---------- */
   continueAsGuest() {
     this.isGuest = true;
   }
 
-  /* ---------- START ---------- */
   startTyping() {
-    this.errors.start = '';
-
     if (!this.isAuthenticated && !this.isGuest) {
-      this.errors.start = 'Please login/signup before continuing';
+      this.errors.start = 'Please login or continue as guest';
       return;
     }
-
-    this.currentPage = 'typing';
+    this.router.navigate(['/typing']);
   }
 
-  goHome() {
-    this.currentPage = 'landing';
-  }
-
-  /* ---------- HEADER ---------- */
   toggleSettings() {
     this.showSettings = !this.showSettings;
   }
@@ -209,13 +80,11 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.isAuthenticated = false;
     this.isGuest = false;
     this.authMode = 'login';
-    this.showSettings = false;
   }
 
-  /* ---------- TYPE EFFECT ---------- */
+  /* Typing effect */
   typeText() {
     const phrase = this.phrases[this.phraseIndex];
-
     if (this.charIndex < phrase.length) {
       this.typingText += phrase[this.charIndex++];
       setTimeout(() => this.typeText(), 100);
