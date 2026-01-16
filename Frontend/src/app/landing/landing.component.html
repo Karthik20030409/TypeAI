@@ -3,10 +3,29 @@
   <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="goHome()">TYPE•AI</div>
+
     <div class="nav-actions">
-      <i class="pi pi-bell nav-icon"></i>
-      <i class="pi pi-user nav-icon"></i>
-      <i class="pi pi-cog nav-icon"></i>
+
+      <!-- NOTIFICATIONS -->
+      <i class="pi pi-bell nav-icon">
+        <span class="badge" *ngIf="notifications">
+          {{ notifications > 9 ? '9+' : notifications }}
+        </span>
+      </i>
+
+      <!-- PROFILE -->
+      <i class="pi pi-user nav-icon profile">
+        <span class="avatar">{{ userInitials }}</span>
+      </i>
+
+      <!-- SETTINGS -->
+      <i class="pi pi-cog nav-icon" (click)="toggleSettings()"></i>
+
+      <div class="settings-menu" *ngIf="showSettings">
+        <span (click)="clearNotifications()">Clear Notifications</span>
+        <span (click)="logout()">Logout</span>
+      </div>
+
     </div>
   </header>
 
@@ -28,11 +47,12 @@
         </button>
 
         <div class="error" *ngIf="errors.start">{{ errors.start }}</div>
+        <div class="success" *ngIf="successMessage">{{ successMessage }}</div>
       </div>
     </div>
 
-    <!-- AUTH -->
-    <aside class="auth-panel">
+    <!-- AUTH (HIDDEN AFTER LOGIN) -->
+    <aside class="auth-panel" *ngIf="!isAuthenticated && !isGuest">
 
       <div class="tabs">
         <span [class.active]="authMode==='login'" (click)="authMode='login'">Login</span>
@@ -56,7 +76,7 @@
       <input *ngIf="authMode!=='forgot'" type="password" [(ngModel)]="password" />
       <div class="error" *ngIf="errors.password">{{ errors.password }}</div>
 
-      <!-- RESET PASSWORD -->
+      <!-- FORGOT PASSWORD -->
       <div *ngIf="authMode==='forgot'">
         <label>New Password</label>
         <input type="password" [(ngModel)]="newPassword" />

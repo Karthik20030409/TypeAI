@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 
 type Page = 'landing' | 'typing';
 
+interface User {
+  name: string;
+  email: string;
+  password: string;
+}
+
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -13,167 +19,146 @@ type Page = 'landing' | 'typing';
 })
 export class LandingComponent implements OnInit, OnDestroy {
 
-  /* ---------------- PAGE ---------------- */
+  /* ---------- PAGE ---------- */
   currentPage: Page = 'landing';
 
-  /* ---------------- AUTH ---------------- */
+  /* ---------- AUTH ---------- */
   authMode: 'login' | 'signup' | 'forgot' = 'login';
   isAuthenticated = false;
   isGuest = false;
 
-  /* ---------------- FORM ---------------- */
+  /* ---------- FORM ---------- */
   name = '';
   email = '';
   password = '';
   newPassword = '';
 
-  errors: {
-    name?: string;
-    email?: string;
-    password?: string;
-    start?: string;
-  } = {};
+  errors: any = {};
+  successMessage = '';
 
-  /* ---------------- TIMER ---------------- */
-  timer = 60;
-  difficulty: 'easy' | 'medium' | 'hard' = 'easy';
-  private intervalId: number | null = null;
+  /* ---------- USER STORAGE (DEMO) ---------- */
+  private registeredUser: User | null = null;
 
-  /* ---------------- TYPING EFFECT ---------------- */
+  /* ---------- HEADER ---------- */
+  notifications = 3;
+  showSettings = false;
+
+  get userInitials(): string {
+    if (this.isGuest) return 'G';
+    return this.name
+      ? this.name.charAt(0).toUpperCase()
+      : this.email.charAt(0).toUpperCase();
+  }
+
+  /* ---------- TYPING EFFECT ---------- */
   typingText = '';
-  phrases: string[] = [
+  phrases = [
     'Improve your accuracy ⚡',
     'Boost your typing speed ⏰',
-    'Challenge yourself daily 📝',
     'Become a typing pro ✨',
   ];
+  phraseIndex = 0;
+  charIndex = 0;
 
-  private phraseIndex = 0;
-  private charIndex = 0;
-
-  /* ---------------- LIFECYCLE ---------------- */
-  ngOnInit(): void {
-    this.startTypingEffect();
+  ngOnInit() {
+    this.typeText();
   }
 
-  ngOnDestroy(): void {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-    }
-  }
+  ngOnDestroy() {}
 
-  /* ---------------- VALIDATION HELPERS ---------------- */
-  private isValidEmail(email: string): boolean {
+  /* ---------- VALIDATION ---------- */
+  isValidEmail(email: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  private isValidPassword(password: string): boolean {
+  isValidPassword(password: string) {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
   }
 
-  /* ---------------- AUTH ---------------- */
-  authenticate(): void {
+  /* ---------- AUTH ---------- */
+  authenticate() {
     this.errors = {};
+    this.successMessage = '';
 
-    // Name (signup only)
-    if (this.authMode === 'signup' && !this.name.trim()) {
-      this.errors.name = 'Please enter your name';
-    }
-
-    // Email
-    if (!this.email) {
-      this.errors.email = 'Please enter email';
-    } else if (!this.isValidEmail(this.email)) {
-      this.errors.email = 'Invalid email format';
-    }
-
-    // Password
-    if (!this.password) {
-      this.errors.password = 'Please enter password';
-    } else if (!this.isValidPassword(this.password)) {
-      this.errors.password =
-        'Password must be 8+ chars with uppercase, lowercase, number & special character';
-    }
-
-    if (Object.keys(this.errors).length > 0) return;
-
-    // SIGN UP FLOW
+    /* SIGN UP */
     if (this.authMode === 'signup') {
-      alert('Account created successfully 🎉');
+      if (!this.name.trim()) {
+        this.errors.name = 'Please enter your name';
+        return;
+      }
+
+      if (!this.email || !this.isValidEmail(this.email)) {
+        this.errors.email = 'Enter valid email';
+        return;
+      }
+
+      if (!this.password || !this.isValidPassword(this.password)) {
+        this.errors.password =
+          'Password must be 8+ chars with uppercase, lowercase, number & special character';
+        return;
+      }
+
+      this.registeredUser = {
+        name: this.name.trim(),
+        email: this.email.trim(),
+        password: this.password,
+      };
+
+      this.successMessage = 'Account created successfully 🎉 Please log in.';
       this.authMode = 'login';
       this.password = '';
       return;
     }
 
-    // LOGIN FLOW
-    this.isAuthenticated = true;
-    this.isGuest = false;
-    alert('Logged in successfully ✅');
-  }
-
-  /* ---------------- START TYPING ---------------- */
-  startTyping(): void {
-    this.errors.start = '';
-
-    if (!this.isAuthenticated && !this.isGuest) {
-      this.errors.start = 'Please login or signup before continuing';
+    /* LOGIN */
+    if (!this.email || !this.isValidEmail(this.email)) {
+      this.errors.email = 'Enter valid email';
       return;
     }
 
-    this.goToTypingPage();
-  }
-
-  private goToTypingPage(): void {
-    this.currentPage = 'typing';
-
-    this.timer =
-      this.difficulty === 'easy'
-        ? 60
-        : this.difficulty === 'medium'
-        ? 45
-        : 30;
-
-    this.startTimer();
-  }
-
-  private startTimer(): void {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
+    if (!this.password) {
+      this.errors.password = 'Please enter password';
+      return;
     }
 
-    this.intervalId = window.setInterval(() => {
-      this.timer--;
-
-      if (this.timer <= 0 && this.intervalId !== null) {
-        clearInterval(this.intervalId);
-        this.intervalId = null;
-      }
-    }, 1000);
-  }
-
-  /* ---------------- NAV ---------------- */
-  goHome(): void {
-    this.currentPage = 'landing';
-
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
+    if (!this.registeredUser) {
+      this.errors.email = 'No account found. Please sign up first';
+      return;
     }
 
-    this.timer = 60;
+    if (this.email !== this.registeredUser.email) {
+      this.errors.email = 'Email not registered';
+      return;
+    }
+
+    if (this.password !== this.registeredUser.password) {
+      this.errors.password = 'Wrong password. Please enter the correct password';
+      return;
+    }
+
+    this.isAuthenticated = true;
+    this.name = this.registeredUser.name;
+    this.successMessage = 'Logged in successfully ✅';
   }
 
-  /* ---------------- FORGOT PASSWORD ---------------- */
-  forgotPassword(): void {
+  /* ---------- FORGOT PASSWORD ---------- */
+  forgotPassword() {
+    this.errors = {};
+    this.successMessage = '';
     this.authMode = 'forgot';
-    this.errors = {};
   }
 
-  resetPassword(): void {
+  resetPassword() {
     this.errors = {};
+    this.successMessage = '';
 
     if (!this.email || !this.isValidEmail(this.email)) {
-      this.errors.email = 'Enter a valid email';
+      this.errors.email = 'Enter valid email';
+      return;
+    }
+
+    if (!this.registeredUser || this.email !== this.registeredUser.email) {
+      this.errors.email = 'Email not registered';
       return;
     }
 
@@ -183,40 +168,70 @@ export class LandingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    alert('Password reset successful ✅');
-
-    this.authMode = 'login';
-    this.password = '';
+    this.registeredUser.password = this.newPassword;
     this.newPassword = '';
+    this.authMode = 'login';
+    this.successMessage = 'Password reset successful ✅ Please log in';
   }
 
-  /* ---------------- GUEST ---------------- */
-  continueAsGuest(): void {
+  /* ---------- GUEST ---------- */
+  continueAsGuest() {
     this.isGuest = true;
-    this.isAuthenticated = false;
-    this.goToTypingPage();
   }
 
-  /* ---------------- TYPING EFFECT ---------------- */
-  private startTypingEffect(): void {
+  /* ---------- START ---------- */
+  startTyping() {
+    this.errors.start = '';
+
+    if (!this.isAuthenticated && !this.isGuest) {
+      this.errors.start = 'Please login/signup before continuing';
+      return;
+    }
+
+    this.currentPage = 'typing';
+  }
+
+  goHome() {
+    this.currentPage = 'landing';
+  }
+
+  /* ---------- HEADER ---------- */
+  toggleSettings() {
+    this.showSettings = !this.showSettings;
+  }
+
+  clearNotifications() {
+    this.notifications = 0;
+    this.showSettings = false;
+  }
+
+  logout() {
+    this.isAuthenticated = false;
+    this.isGuest = false;
+    this.authMode = 'login';
+    this.showSettings = false;
+  }
+
+  /* ---------- TYPE EFFECT ---------- */
+  typeText() {
     const phrase = this.phrases[this.phraseIndex];
 
     if (this.charIndex < phrase.length) {
       this.typingText += phrase[this.charIndex++];
-      setTimeout(() => this.startTypingEffect(), 100);
+      setTimeout(() => this.typeText(), 100);
     } else {
-      setTimeout(() => this.eraseTyping(), 1500);
+      setTimeout(() => this.eraseText(), 1200);
     }
   }
 
-  private eraseTyping(): void {
+  eraseText() {
     if (this.charIndex > 0) {
       this.typingText = this.typingText.slice(0, -1);
       this.charIndex--;
-      setTimeout(() => this.eraseTyping(), 50);
+      setTimeout(() => this.eraseText(), 50);
     } else {
       this.phraseIndex = (this.phraseIndex + 1) % this.phrases.length;
-      this.startTypingEffect();
+      this.typeText();
     }
   }
 }
