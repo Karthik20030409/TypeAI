@@ -1,18 +1,64 @@
 <div class="typing-app">
 
+  <!-- LEFT -->
   <aside class="info-panel">
     <h2>Speed is <span>intelligence</span></h2>
-    <p>Type calmly Accuracy matters more than speed</p>
+    <p>Type calmly. Accuracy matters more than speed.</p>
+
+    <!-- DIFFICULTY -->
+    <div class="difficulty">
+      <button
+        [class.active]="difficulty==='easy'"
+        (click)="difficulty='easy'; startGame()">
+        Easy
+      </button>
+
+      <button
+        [class.active]="difficulty==='medium'"
+        (click)="difficulty='medium'; startGame()">
+        Medium
+      </button>
+
+      <button
+        [class.active]="difficulty==='hard'"
+        (click)="difficulty='hard'; startGame()">
+        Hard
+      </button>
+    </div>
 
     <div class="timer">⏱ {{ timeLeft }}s</div>
 
-    <div *ngIf="finished" style="margin-top:2rem">
-      <h3>🎉 Excellent Work</h3>
-      <p>Accuracy <b>{{ accuracy }}%</b></p>
-      <p>Completion <b>{{ completion }}%</b></p>
+    <!-- RESULT -->
+    <div *ngIf="finished" class="dashboard">
+
+      <div class="meter">
+        <div class="circle"
+          [style.background]="'conic-gradient(#4caf50 ' + accuracy + '%, #ddd 0)'">
+          <span>{{ accuracy }}%</span>
+        </div>
+        <p>Accuracy</p>
+      </div>
+
+      <div class="meter">
+        <div class="circle"
+          [style.background]="'conic-gradient(#2196f3 ' + completion + '%, #ddd 0)'">
+          <span>{{ completion }}%</span>
+        </div>
+        <p>Completion</p>
+      </div>
+
+      <div class="meter">
+        <div class="circle"
+          [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
+          <span>{{ timeTaken }}s</span>
+        </div>
+        <p>Time</p>
+      </div>
+
     </div>
   </aside>
 
+  <!-- RIGHT -->
   <section class="typing-panel">
     <div class="sentence">
       <span
@@ -25,7 +71,7 @@
     </div>
 
     <p class="hint" *ngIf="!timerStarted">
-      Start typing to begin
+      Start typing to begin ⌨️
     </p>
   </section>
 

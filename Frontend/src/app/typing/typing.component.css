@@ -1,6 +1,6 @@
 .typing-app {
   display: flex;
-  min-height: 100vh; /* ✅ FIX */
+  min-height: 100vh;
   padding: 3rem;
   background: linear-gradient(135deg, #8dacd8 0%, #f0ebd8 100%);
 }
@@ -9,7 +9,7 @@
 .info-panel {
   width: 25%;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255,255,255,0.55);
   backdrop-filter: blur(18px);
   border-radius: 1.6rem;
 }
@@ -20,17 +20,37 @@
 }
 
 .info-panel h2 span {
-    background: linear-gradient(90deg, #f6d365, #fda085);
-
-  background-clip: text;              /* ✅ Standard */
-  -webkit-background-clip: text;      /* ✅ Safari / Chrome */
-
+  background: linear-gradient(90deg, #f6d365, #fda085);
+  background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .info-panel p {
   margin-top: 1rem;
   opacity: 0.8;
+}
+
+/* DIFFICULTY BUTTONS */
+.difficulty {
+  margin-top: 1.2rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.difficulty button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: rgba(255,255,255,0.6);
+}
+
+.difficulty button.active {
+  background: #243119;
+  color: white;
 }
 
 .timer {
@@ -49,20 +69,16 @@
 }
 
 .sentence {
-  font-size: 1.4rem;
-  line-height: 2.2rem;
+  font-size: 1.8rem;
+  line-height: 2.8rem;
+  max-width: 900px;
+  white-space: pre-wrap;
   user-select: none;
   font-weight: 500;
 }
 
-.pending {
-  color: #999;
-}
-
-.correct {
-  color: #0d1321;
-}
-
+.pending { color: #999; }
+.correct { color: #0d1321; }
 .wrong {
   color: #f44336;
   text-decoration: underline;
@@ -71,15 +87,33 @@
 .hint {
   margin-top: 2rem;
   opacity: 0.6;
-  font-size: 0.9rem;
 }
 
-.sentence {
-  font-size: 1.8rem;        /* ✅ BIGGER */
-  line-height: 2.8rem;      /* ✅ MULTI LINE */
-  max-width: 900px;
-  user-select: none;
-  font-weight: 500;
-  white-space: pre-wrap;    /* ✅ preserves line breaks */
+/* RESULT */
+.dashboard {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
+.meter {
+  text-align: center;
+}
+
+.circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.circle span {
+  background: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
