@@ -21,7 +21,6 @@ export class LandingComponent implements OnInit {
   name = '';
   email = '';
   password = '';
-  newPassword = '';
 
   errors: any = {};
   successMessage = '';
@@ -57,6 +56,7 @@ export class LandingComponent implements OnInit {
 
   continueAsGuest() {
     this.isGuest = true;
+  this.router.navigate(['/typing']);
   }
 
   startTyping() {
@@ -82,7 +82,7 @@ export class LandingComponent implements OnInit {
     this.authMode = 'login';
   }
 
-  /* Typing effect */
+  /* Typing animation */
   typeText() {
     const phrase = this.phrases[this.phraseIndex];
     if (this.charIndex < phrase.length) {

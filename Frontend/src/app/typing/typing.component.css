@@ -73,3 +73,13 @@
   opacity: 0.6;
   font-size: 0.9rem;
 }
+
+.sentence {
+  font-size: 1.8rem;        /* ✅ BIGGER */
+  line-height: 2.8rem;      /* ✅ MULTI LINE */
+  max-width: 900px;
+  user-select: none;
+  font-weight: 500;
+  white-space: pre-wrap;    /* ✅ preserves line breaks */
+}
+
