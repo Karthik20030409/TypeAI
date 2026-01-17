@@ -23,6 +23,7 @@ export class TypingComponent implements OnInit, OnDestroy {
   totalTime = 0;
   timerStarted = false;
   interval: any;
+  showSettings = false;
 
   private wordPool = [
     'typing','speed','accuracy','focus','discipline','practice',
@@ -61,6 +62,9 @@ export class TypingComponent implements OnInit, OnDestroy {
       );
     }
     return result.join(' ');
+  }
+  toggleSettings() {
+    this.showSettings = !this.showSettings;
   }
 
   /* ---------- GAME LOGIC ---------- */

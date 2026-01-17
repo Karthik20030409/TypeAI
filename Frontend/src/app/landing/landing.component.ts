@@ -106,17 +106,9 @@ export class LandingComponent implements OnInit {
     this.showSettings = !this.showSettings;
   }
 
-  clearNotifications() {
-    this.notifications = 0;
-    this.showSettings = false;
-  }
+  
 
-  logout() {
-    this.isAuthenticated = false;
-    this.isGuest = false;
-    this.authMode = 'login';
-  }
-
+ 
   /* Typing animation */
   typeText() {
     const phrase = this.phrases[this.phraseIndex];

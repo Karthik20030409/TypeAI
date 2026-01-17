@@ -1,38 +1,72 @@
+<div class="app">
+<header class="header">
+    <div class="logo">TYPE•AI</div>
+
+    <div class="nav-actions">
+      <i class="pi pi-bell nav-icon"> </i>
+
+      <i class="pi pi-user nav-icon profile"> </i>
+      <i class="pi pi-cog nav-icon" (click)="toggleSettings()"></i>
+      <div class="settings-menu" *ngIf="showSettings">
+        <span>option 1</span>
+        <span>option 2 </span>
+      </div>
+    </div>
+  </header>
 <div class="typing-app">
 
-  <!-- LEFT -->
-  <aside class="info-panel">
-    <h2>Speed is <span>intelligence</span></h2>
-    <p>Type calmly. Accuracy matters more than speed.</p>
+   <main class="typing-wrapper">
 
-    <!-- DIFFICULTY -->
-    <div class="difficulty">
-      <button
-        [class.active]="difficulty==='easy'"
-        (click)="difficulty='easy'; startGame()">
-        Easy
-      </button>
+    <!-- TOP BAR -->
+    <div class="typing-top">
+      <div class="difficulty">
+        <button
+          [class.active]="difficulty==='easy'"
+          (click)="difficulty='easy'; startGame()">
+          Easy
+        </button>
 
-      <button
-        [class.active]="difficulty==='medium'"
-        (click)="difficulty='medium'; startGame()">
-        Medium
-      </button>
+        <button
+          [class.active]="difficulty==='medium'"
+          (click)="difficulty='medium'; startGame()">
+          Medium
+        </button>
 
-      <button
-        [class.active]="difficulty==='hard'"
-        (click)="difficulty='hard'; startGame()">
-        Hard
-      </button>
+        <button
+          [class.active]="difficulty==='hard'"
+          (click)="difficulty='hard'; startGame()">
+          Hard
+        </button>
+      </div>
+
+      <div class="timer">
+        {{ timeLeft }}<span>s</span>
+      </div>
     </div>
 
-    <div class="timer">⏱ {{ timeLeft }}s</div>
+    <!-- SENTENCE CARD -->
+    <div class="typing-card">
+       <ng-container *ngIf="!finished; else resultView">
+      <div class="sentence">
+        <span
+          *ngFor="let l of letters"
+          [class.pending]="l.status==='pending'"
+          [class.correct]="l.status==='correct'"
+          [class.wrong]="l.status==='wrong'">
+          {{ l.char === ' ' ? '\u00A0' : l.char }}
+        </span>
+      </div>
 
-    <!-- RESULT -->
-    <div *ngIf="finished" class="dashboard">
+      <p class="hint" *ngIf="!timerStarted">
+        Start typing to begin ⌨️
+      </p>
+    </ng-container>
+     <ng-template #resultView>
+    <div class="dashboard">
 
       <div class="meter">
-        <div class="circle"
+        <div
+          class="circle"
           [style.background]="'conic-gradient(#4caf50 ' + accuracy + '%, #ddd 0)'">
           <span>{{ accuracy }}%</span>
         </div>
@@ -40,7 +74,8 @@
       </div>
 
       <div class="meter">
-        <div class="circle"
+        <div
+          class="circle"
           [style.background]="'conic-gradient(#2196f3 ' + completion + '%, #ddd 0)'">
           <span>{{ completion }}%</span>
         </div>
@@ -48,7 +83,8 @@
       </div>
 
       <div class="meter">
-        <div class="circle"
+        <div
+          class="circle"
           [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
           <span>{{ timeTaken }}s</span>
         </div>
@@ -56,23 +92,15 @@
       </div>
 
     </div>
-  </aside>
-
-  <!-- RIGHT -->
-  <section class="typing-panel">
-    <div class="sentence">
-      <span
-        *ngFor="let l of letters"
-        [class.pending]="l.status==='pending'"
-        [class.correct]="l.status==='correct'"
-        [class.wrong]="l.status==='wrong'">
-        {{ l.char === ' ' ? '\u00A0' : l.char }}
-      </span>
+  </ng-template>
     </div>
 
-    <p class="hint" *ngIf="!timerStarted">
-      Start typing to begin ⌨️
-    </p>
-  </section>
+    <!-- RESTART -->
+    <button class="restart-btn" (click)="startGame()">
+      ⟳ Restart Test
+    </button>
 
+  </main>
+
+</div>
 </div>

@@ -1,32 +1,22 @@
 <div class="app">
-
   <!-- HEADER -->
   <header class="header">
     <div class="logo">TYPE•AI</div>
 
     <div class="nav-actions">
-      <i class="pi pi-bell nav-icon">
-        <span class="badge" *ngIf="notifications">
-          {{ notifications > 9 ? '9+' : notifications }}
-        </span>
-      </i>
+      <i class="pi pi-bell nav-icon"> </i>
 
-      <i class="pi pi-user nav-icon profile">
-        <span class="avatar">{{ userInitials }}</span>
-      </i>
-
+      <i class="pi pi-user nav-icon profile"> </i>
       <i class="pi pi-cog nav-icon" (click)="toggleSettings()"></i>
-
       <div class="settings-menu" *ngIf="showSettings">
-        <span (click)="clearNotifications()">Clear Notifications</span>
-        <span (click)="logout()">Logout</span>
+        <span>option 1</span>
+        <span>option 2 </span>
       </div>
     </div>
   </header>
 
   <!-- MAIN -->
   <section class="main">
-
     <!-- HERO -->
     <div class="hero">
       <div class="hero-inner">
@@ -40,19 +30,23 @@
         <button class="primary btn-animated" (click)="startTyping()">
           Start Typing
         </button>
-
       </div>
     </div>
 
     <!-- AUTH -->
-    <aside class="auth-panel" *ngIf="!isAuthenticated && !isGuest">
-
+    <aside class="auth-panel">
       <div class="tabs">
-        <span [class.active]="authMode==='login'" (click)="authMode='login'">Login</span>
-        <span [class.active]="authMode==='signup'" (click)="authMode='signup'">Sign Up</span>
+        <span [class.active]="authMode === 'login'" (click)="authMode = 'login'"
+          >Login</span
+        >
+        <span
+          [class.active]="authMode === 'signup'"
+          (click)="authMode = 'signup'"
+          >Sign Up</span
+        >
       </div>
 
-      <div *ngIf="authMode==='signup'">
+      <div *ngIf="authMode === 'signup'">
         <label>Name</label>
         <input [(ngModel)]="name" />
         <div class="error">{{ errors.name }}</div>
@@ -67,19 +61,22 @@
       <div class="error">{{ errors.password }}</div>
 
       <button class="primary btn-animated login" (click)="authenticate()">
-        {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
+        {{ authMode === "login" ? "Log In" : "Create Account" }}
       </button>
 
       <div class="links">
         <span (click)="forgotPassword()">Forgot Password?</span>
         <span (click)="continueAsGuest()">Continue as Guest</span>
       </div>
-
     </aside>
-
   </section>
 </div>
-<div class="toast-notification" *ngIf="toast.show" [ngClass]="toast.type" (click)="toast.show = false">
+<div
+  class="toast-notification"
+  *ngIf="toast.show"
+  [ngClass]="toast.type"
+  (click)="toast.show = false"
+>
   <div class="toast-left">
     <span class="toast-icon">
       <ng-container *ngIf="toast.type === 'success'">✔️</ng-container>
@@ -92,4 +89,3 @@
   </div>
   <span class="toast-close" (click)="toast.show = false">&times;</span>
 </div>
-
