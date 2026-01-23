@@ -2,7 +2,6 @@
   display: block;
   height: 100vh;
   font-family: Inter, system-ui, sans-serif;
-
   --bg-main: #f0ebd8;
   --bg-header: #7c93b0;
   --bg-footer: #4b5f77;
@@ -21,32 +20,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10; 
+  z-index: 10;
 }
 .nav-actions {
   display: flex;
   align-items: center;
   gap: 4rem;
 }
-
 .nav-icon {
   font-size: 1.2rem;
   cursor: pointer;
-  color:  #0d1321;
+  color: #0d1321;
   transition: color 0.2s ease;
 }
-
 .nav-icon:hover {
-  color:#8dacd8;
+  color: #8dacd8;
 }
-
 .logo {
-  color:  #0d1321; ;
+  color: #0d1321;
   font-size: 1.3rem;
   font-weight: 900;
   cursor: pointer;
 }
-
 .login-btn {
   background: var(--accent);
   color: #fff;
@@ -55,27 +50,16 @@
   border-radius: 999px;
   cursor: pointer;
 }
-
-
-
 .typing-app {
- flex: 1;
- 
+  flex: 1;
   display: flex;
   position: relative;
   padding: 3rem;
-  background: linear-gradient(
-   135deg,
-    #8dacd8 0%,
-    #f0ebd8 55%,
-    #f0ebd8 100%
-  );
+  background: linear-gradient(135deg, #8dacd8 0%, #f0ebd8 55%, #f0ebd8 100%);
   overflow: hidden;
 }
-
 .typing-wrapper {
   width: 100%;
-
   margin: 3rem auto;
   padding: 0 1.5rem;
 }
@@ -87,9 +71,7 @@
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-}
-
-/* DIFFICULTY BUTTONS */
+} /* DIFFICULTY BUTTONS */
 .difficulty {
   display: flex;
   background: #dbe3ee;
@@ -98,7 +80,7 @@
   gap: 6px;
 }
 .difficulty button {
-  background: #f6d365; 
+  background: #f6d365;
   color: #2575fc;
   border: none;
   padding: 0.8rem 2rem;
@@ -107,9 +89,8 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
-
 .difficulty button {
   border: none;
   padding: 0.45rem 1.1rem;
@@ -120,13 +101,11 @@
   color: #475569;
   cursor: pointer;
 }
-
 .difficulty button.active {
   background: #5b9bd5;
   color: #fff;
   box-shadow: 0 4px 12px rgba(91, 155, 213, 0.4);
-}
-/* Timer */
+} /* Timer */
 .timer {
   font-size: 3.2rem;
   font-weight: 800;
@@ -139,36 +118,35 @@
   font-size: 1.1rem;
   font-weight: 600;
   opacity: 0.8;
-}
-/* RIGHT */
+} /* RIGHT */
 .typing-card {
   margin-top: 2rem;
   background: #fff;
   border-radius: 16px;
   padding: 2.8rem 3rem;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
- 
 }
 .typing-card > * {
   animation: fadeIn 0.3s ease;
 }
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
 .sentence {
-  height: 10rem;              /* FIXED AREA */
+  height: 10rem; /* FIXED AREA */
   overflow: hidden;
-
   font-size: clamp(1.4rem, 2.2vw, 2rem);
   line-height: 1;
-  font-family: 'JetBrains Mono', monospace;
-
+  font-family: "JetBrains Mono", monospace;
   letter-spacing: -0.12em;
   word-spacing: 0.1em;
-
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -176,32 +154,23 @@
 .sentence span {
   position: relative;
   display: inline-flex;
-  align-items: center;
-
-  /* remove visual gaps */
+  align-items: center; /* remove visual gaps */
   padding: 0.08em 0.14em;
   margin: 0;
   border-radius: 4px;
 }
-
 .sentence span.correct {
   color: #111827;
   background: #c7f0d8;
 }
-
 .sentence span.wrong {
   color: #b91c1c;
   background: #fee2e2;
 }
-
 .sentence span.pending {
   color: #9ca3af;
   background: transparent;
-}
-
-/* Cursor effect */
-
-
+} /* Cursor effect */
 .hint {
   margin-top: 1.6rem;
   font-size: 0.95rem;
@@ -221,16 +190,13 @@
 }
 .restart-btn:hover {
   background: #f9fafb;
-}
-
-/* RESULT */
+} /* RESULT */
 .dashboard {
   margin-top: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
-
 .meter {
   display: flex;
   flex-direction: column;
@@ -241,7 +207,6 @@
   font-size: 0.75rem;
   color: #94a3b8;
 }
-
 .circle {
   width: 90px;
   height: 90px;
@@ -249,7 +214,6 @@
   display: grid;
   place-items: center;
 }
-
 .circle span {
   background: white;
   width: 70px;
@@ -259,26 +223,4 @@
   place-items: center;
   font-weight: bold;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

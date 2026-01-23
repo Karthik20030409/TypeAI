@@ -12,9 +12,10 @@ import { Router } from '@angular/router';
 })
 export class LandingComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
   authMode: 'login' | 'signup' | 'forgot' = 'login';
+
   isAuthenticated = false;
   isGuest = false;
 
@@ -23,9 +24,6 @@ export class LandingComponent implements OnInit {
   password = '';
 
   errors: any = {};
-  successMessage = '';
-
-  notifications = 3;
   showSettings = false;
 
   typingText = '';
@@ -36,80 +34,118 @@ export class LandingComponent implements OnInit {
   ];
   phraseIndex = 0;
   charIndex = 0;
+
   toast = {
     show: false,
     message: '',
-    type: 'success' // or 'error'
+    type: 'success' as 'success' | 'error'
   };
-
 
   ngOnInit() {
     this.typeText();
   }
 
-  get userInitials(): string {
-    return this.isGuest ? 'G' : (this.name || this.email)[0]?.toUpperCase();
+  /* ================= VALIDATION ================= */
+
+  private isValidEmail(email: string): boolean {
+    return email.includes('@') && email.includes('.');
+  }
+
+  private isValidPassword(password: string): boolean {
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[@$!%*?&]/.test(password);
+    return password.length >= 8 && hasUpper && hasLower && hasNumber && hasSpecial;
+  }
+
+  /* ================= AUTH ================= */
+
+  authenticate() {
+
+    // NAME (SIGNUP)
+    if (this.authMode === 'signup' && !this.name.trim()) {
+      this.showToast('Please enter the name', 'error');
+      return;
+    }
+
+    // EMAIL
+    if (!this.email.trim()) {
+      this.showToast('Please enter the email', 'error');
+      return;
+    }
+
+    if (!this.isValidEmail(this.email)) {
+      this.showToast('Invalid email. Please enter a valid email', 'error');
+      return;
+    }
+
+    // PASSWORD
+    if (!this.password.trim()) {
+      this.showToast('Please enter the password', 'error');
+      return;
+    }
+
+    if (!this.isValidPassword(this.password)) {
+      this.showToast(
+        'Invalid password. Password must contain at least 1 uppercase, 1 lowercase, 1 number, 1 special character and be at least 8 characters long.',
+        'error'
+      );
+      return;
+    }
+
+    // SUCCESS
+    this.isAuthenticated = true;
+
+    this.showToast(
+      this.authMode === 'login'
+        ? 'Logged in successfully'
+        : 'Account created successfully',
+      'success'
+    );
+  }
+
+  /* ================= ACTIONS ================= */
+
+  continueAsGuest() {
+    this.isGuest = true;
+    this.showToast('Logged in as GUEST', 'success');
+  }
+
+  startTyping() {
+    if (!this.isAuthenticated && !this.isGuest) {
+      this.showToast('Please login or continue as guest', 'error');
+      return;
+    }
+
+    this.router.navigate(['/typing']);
   }
 
   forgotPassword() {
     this.authMode = 'forgot';
   }
 
-  authenticate() {
-    this.isAuthenticated = true;
-    this.showToast(
-      this.authMode === 'login'
-        ? 'Logged in successfully'
-        : 'Account created successfully'
-    );
-
-  }
-  showToast(message: string, type: 'success' | 'error' = 'success') {
-    this.toast.message = message;
-    this.toast.type = type;
-    this.toast.show = true;
-    if (this.toast.type == 'success') {
-      setTimeout(() => {
-        this.toast.show = false;
-        this.router.navigate(['/typing']);
-      }, 1000);
-    }
-    if (this.toast.type == 'error') {
-      setTimeout(() => {
-        this.toast.show = false;
-      }, 2000);
-    }
-
-  }
-
-  continueAsGuest() {
-    this.isGuest = true;
-    this.showToast(
-      'Logged in as GUEST'
-    )
-  }
-
-  startTyping() {
-    if (!this.isAuthenticated && !this.isGuest) {
-      this.errors.start = 'Please login or continue as guest';
-      this.showToast(
-        'Please login or continue as guest', 'error'
-      )
-
-      return;
-    }
-
-
-  }
-
   toggleSettings() {
     this.showSettings = !this.showSettings;
   }
 
-  
+  /* ================= TOAST ================= */
 
- 
-  /* Typing animation */
+  showToast(message: string, type: 'success' | 'error' = 'success') {
+    this.toast.message = message;
+    this.toast.type = type;
+    this.toast.show = true;
+
+    setTimeout(() => {
+      this.toast.show = false;
+      if (type === 'success') {
+        this.router.navigate(['/typing']);
+      }
+    }, type === 'success' ? 1000 : 2000);
+  }
+
+  /* ================= TYPING EFFECT ================= */
+
   typeText() {
     const phrase = this.phrases[this.phraseIndex];
     if (this.charIndex < phrase.length) {
