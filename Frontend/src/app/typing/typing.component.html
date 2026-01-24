@@ -1,106 +1,92 @@
 <div class="app">
-<header class="header">
+  <header class="header">
     <div class="logo">TYPE•AI</div>
 
     <div class="nav-actions">
-      <i class="pi pi-bell nav-icon"> </i>
-
-      <i class="pi pi-user nav-icon profile"> </i>
+      <i class="pi pi-bell nav-icon"></i>
+      <i class="pi pi-user nav-icon profile"></i>
       <i class="pi pi-cog nav-icon" (click)="toggleSettings()"></i>
+
       <div class="settings-menu" *ngIf="showSettings">
         <span>option 1</span>
-        <span>option 2 </span>
+        <span>option 2</span>
       </div>
     </div>
   </header>
-<div class="typing-app">
 
-   <main class="typing-wrapper">
+  <div class="typing-app">
+    <main class="typing-wrapper">
 
-    <!-- TOP BAR -->
-    <div class="typing-top">
-      <div class="difficulty">
-        <button
-          [class.active]="difficulty==='easy'"
-          (click)="difficulty='easy'; startGame()">
-          Easy
-        </button>
-
-        <button
-          [class.active]="difficulty==='medium'"
-          (click)="difficulty='medium'; startGame()">
-          Medium
-        </button>
-
-        <button
-          [class.active]="difficulty==='hard'"
-          (click)="difficulty='hard'; startGame()">
-          Hard
-        </button>
-      </div>
-
-      <div class="timer">
-        {{ timeLeft }}<span>s</span>
-      </div>
-    </div>
-
-    <!-- SENTENCE CARD -->
-    <div class="typing-card">
-       <ng-container *ngIf="!finished; else resultView">
-      <div class="sentence">
-        <span
-          *ngFor="let l of letters"
-          [class.pending]="l.status==='pending'"
-          [class.correct]="l.status==='correct'"
-          [class.wrong]="l.status==='wrong'">
-          {{ l.char === ' ' ? '\u00A0' : l.char }}
-        </span>
-      </div>
-
-      <p class="hint" *ngIf="!timerStarted">
-        Start typing to begin ⌨️
+      <p class="motivation-top" *ngIf="motivationText">
+        {{ motivationText }}
       </p>
-    </ng-container>
-     <ng-template #resultView>
-    <div class="dashboard">
 
-      <div class="meter">
-        <div
-          class="circle"
-          [style.background]="'conic-gradient(#4caf50 ' + accuracy + '%, #ddd 0)'">
-          <span>{{ accuracy }}%</span>
+      <div class="typing-top">
+        <div class="difficulty">
+          <button [class.active]="difficulty==='easy'" (click)="difficulty='easy'; startGame()">Easy</button>
+          <button [class.active]="difficulty==='medium'" (click)="difficulty='medium'; startGame()">Medium</button>
+          <button [class.active]="difficulty==='hard'" (click)="difficulty='hard'; startGame()">Hard</button>
         </div>
-        <p>Accuracy</p>
+
+        <div class="timer">
+          {{ timeLeft }}<span>s</span>
+        </div>
       </div>
 
-      <div class="meter">
-        <div
-          class="circle"
-          [style.background]="'conic-gradient(#2196f3 ' + completion + '%, #ddd 0)'">
-          <span>{{ completion }}%</span>
-        </div>
-        <p>Completion</p>
+      <div class="typing-card">
+        <ng-container *ngIf="!finished; else resultView">
+
+          <div class="sentence" #sentenceBox>
+            <span
+              *ngFor="let l of letters; let i = index"
+              [class.pending]="l.status==='pending'"
+              [class.correct]="l.status==='correct'"
+              [class.wrong]="l.status==='wrong'"
+              #charEl>
+              {{ l.char === ' ' ? '\u00A0' : l.char }}
+            </span>
+
+            <span class="caret" [style.transform]="caretTransform">|</span>
+          </div>
+
+          <p class="hint" *ngIf="!timerStarted">
+            Start typing to begin ⌨️
+          </p>
+
+        </ng-container>
+
+        <ng-template #resultView>
+          <p class="motivation celebration">
+            {{ celebrationMessage }}
+          </p>
+
+          <div class="dashboard">
+            <div class="meter">
+              <div class="circle" [style.background]="'conic-gradient(#4caf50 ' + accuracy + '%, #ddd 0)'">
+                <span>{{ accuracy }}%</span>
+              </div>
+              <p>Accuracy</p>
+            </div>
+
+            <div class="meter">
+              <div class="circle" [style.background]="'conic-gradient(#2196f3 ' + completion + '%, #ddd 0)'">
+                <span>{{ completion }}%</span>
+              </div>
+              <p>Completion</p>
+            </div>
+
+            <div class="meter">
+              <div class="circle" [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
+                <span>{{ timeTaken }}s</span>
+              </div>
+              <p>Time</p>
+            </div>
+          </div>
+        </ng-template>
       </div>
 
-      <div class="meter">
-        <div
-          class="circle"
-          [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
-          <span>{{ timeTaken }}s</span>
-        </div>
-        <p>Time</p>
-      </div>
+      <button class="restart-btn" (click)="startGame()">⟳ Restart Test</button>
 
-    </div>
-  </ng-template>
-    </div>
-
-    <!-- RESTART -->
-    <button class="restart-btn" (click)="startGame()">
-      ⟳ Restart Test
-    </button>
-
-  </main>
-
-</div>
+    </main>
+  </div>
 </div>

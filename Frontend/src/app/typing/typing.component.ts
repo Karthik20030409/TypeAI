@@ -3,6 +3,9 @@ import {
   HostListener,
   OnInit,
   OnDestroy,
+  ViewChildren,
+  QueryList,
+  ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -25,13 +28,9 @@ export class TypingComponent implements OnInit, OnDestroy {
   interval: any;
   showSettings = false;
 
-  private wordPool = [
-    'typing','speed','accuracy','focus','discipline','practice',
-    'calm','hands','rhythm','flow','learning','progress',
-    'consistency','skill','improvement','control','confidence',
-    'performance','precision','mastery','patience','clarity',
-    'attention','growth','stability','momentum'
-  ];
+  motivationText = '';
+  celebrationMessage = '';
+  private motivationInterval: any;
 
   sentence = '';
   letters: { char: string; status: 'pending' | 'correct' | 'wrong' }[] = [];
@@ -40,101 +39,120 @@ export class TypingComponent implements OnInit, OnDestroy {
   mistakes = 0;
   finished = false;
 
+  caretTransform = 'translate3d(0,0,0)';
+  showCelebration = false;
+
+  @ViewChildren('charEl') charElements!: QueryList<ElementRef>;
+
   ngOnInit() {
     this.startGame();
   }
 
   ngOnDestroy() {
     clearInterval(this.interval);
+    clearInterval(this.motivationInterval);
   }
 
-  /* ---------- HELPERS ---------- */
-
-  private randomBetween(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  private generateSentence(words: number): string {
-    const result: string[] = [];
-    for (let i = 0; i < words; i++) {
-      result.push(
-        this.wordPool[Math.floor(Math.random() * this.wordPool.length)]
-      );
-    }
-    return result.join(' ');
-  }
   toggleSettings() {
     this.showSettings = !this.showSettings;
   }
 
-  /* ---------- GAME LOGIC ---------- */
+  /* ---------- GAME ---------- */
 
   startGame() {
     clearInterval(this.interval);
+    clearInterval(this.motivationInterval);
 
     this.timerStarted = false;
     this.finished = false;
     this.index = 0;
     this.mistakes = 0;
+    this.motivationText = '';
+    this.celebrationMessage = '';
+    this.showCelebration = false;
 
-    let words = 30;
+    const wordPool = [
+      'focus','discipline','clarity','control','precision','growth',
+      'momentum','confidence','flow','patience','mastery','calm'
+    ];
 
-    if (this.difficulty === 'easy') {
-      this.totalTime = this.randomBetween(30, 45);
-      words = this.randomBetween(25, 40); // 1–3 lines
-    }
+    const words =
+      this.difficulty === 'easy' ? 30 :
+      this.difficulty === 'medium' ? 70 : 120;
 
-    if (this.difficulty === 'medium') {
-      this.totalTime = this.randomBetween(60, 90);
-      words = this.randomBetween(60, 90); // 4–6 lines
-    }
-
-    if (this.difficulty === 'hard') {
-      this.totalTime = this.randomBetween(90, 120);
-      words = this.randomBetween(100, 140); // 6+ lines
-    }
+    this.totalTime =
+      this.difficulty === 'easy' ? 45 :
+      this.difficulty === 'medium' ? 75 : 120;
 
     this.timeLeft = this.totalTime;
-    this.sentence = this.generateSentence(words);
 
-    this.letters = this.sentence.split('').map(char => ({
-      char,
+    this.sentence = Array.from({ length: words }, () =>
+      wordPool[Math.floor(Math.random() * wordPool.length)]
+    ).join(' ');
+
+    this.letters = this.sentence.split('').map(c => ({
+      char: c,
       status: 'pending',
     }));
+
+    setTimeout(() => this.updateCaret());
   }
 
-  /* ---------- TIMER ---------- */
+  /* ---------- TIMER + MOTIVATION ---------- */
 
   startTimer() {
     if (this.timerStarted) return;
     this.timerStarted = true;
 
+    this.motivationInterval = setInterval(() => {
+      const acc = this.accuracy;
+      const speed = this.index / Math.max(this.timeTaken, 1);
+
+      if (acc > 95) {
+        this.motivationText = '🔥 Elite precision. Stay locked in.';
+      } else if (speed > 4) {
+        this.motivationText = '⚡ Fast hands. Calm control.';
+      } else if (this.mistakes === 0) {
+        this.motivationText = '🎯 Flawless rhythm. Beautiful.';
+      } else {
+        this.motivationText = '🧠 Slow is smooth. Smooth is fast.';
+      }
+    }, 5000);
+
     this.interval = setInterval(() => {
       this.timeLeft--;
-      if (this.timeLeft <= 0) {
-        this.finishTest();
-      }
+      if (this.timeLeft <= 0) this.finishTest();
     }, 1000);
   }
 
   finishTest() {
     if (this.finished) return;
     this.finished = true;
+
     clearInterval(this.interval);
+    clearInterval(this.motivationInterval);
+
+    this.showCelebration = true;
+
+    this.celebrationMessage =
+      `🏆 Outstanding work.\n
+Accuracy ${this.accuracy}% • Completion ${this.completion}%\n
+This is real progress. Run it again and sharpen your edge.`;
   }
 
   /* ---------- METRICS ---------- */
 
-  get timeTaken(): number {
+  get timeTaken() {
     return this.totalTime - this.timeLeft;
   }
 
-  get accuracy(): number {
-    if (this.index === 0) return 0;
-    return Math.round(((this.index - this.mistakes) / this.index) * 100);
+  get accuracy() {
+    return this.index === 0
+      ? 0
+      : Math.round(((this.index - this.mistakes) / this.index) * 100);
   }
 
-  get completion(): number {
+  get completion() {
     return Math.round((this.index / this.letters.length) * 100);
   }
 
@@ -142,15 +160,16 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
+
+    if (event.key === ' ') event.preventDefault();
     if (this.finished || this.timeLeft <= 0) return;
 
     this.startTimer();
 
-    if (event.key === 'Backspace') {
-      if (this.index > 0) {
-        this.index--;
-        this.letters[this.index].status = 'pending';
-      }
+    if (event.key === 'Backspace' && this.index > 0) {
+      this.index--;
+      this.letters[this.index].status = 'pending';
+      this.updateCaret();
       return;
     }
 
@@ -159,15 +178,31 @@ export class TypingComponent implements OnInit, OnDestroy {
     const current = this.letters[this.index];
     if (!current) return;
 
-    current.status =
-      event.key === current.char ? 'correct' : 'wrong';
-
+    current.status = event.key === current.char ? 'correct' : 'wrong';
     if (current.status === 'wrong') this.mistakes++;
 
     this.index++;
+    this.updateCaret();
 
     if (this.index === this.letters.length) {
       this.finishTest();
     }
+  }
+
+  /* ---------- CARET (PIXEL PERFECT) ---------- */
+
+  updateCaret() {
+    requestAnimationFrame(() => {
+      const el = this.charElements.get(this.index);
+      if (!el) return;
+
+      const node = el.nativeElement as HTMLElement;
+
+      const x = node.offsetLeft;
+      const y = node.offsetTop;
+
+      this.caretTransform =
+        `translate3d(${x}px, ${y}px, 0)`;
+    });
   }
 }
