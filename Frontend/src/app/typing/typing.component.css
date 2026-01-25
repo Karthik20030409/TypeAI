@@ -269,3 +269,69 @@
   overflow-x: hidden;
   scroll-behavior: smooth;   /* ✅ NICE FEEL */
 }
+
+.sentence {
+  height: 10rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* CARET – FIXED & BLINKING */
+.caret {
+  display: inline-block;
+  margin-right: 2px;
+  color: #2563eb;
+  font-weight: 900;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.sentence {
+  position: relative; /* ✅ REQUIRED FOR CARET */
+  height: 10rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* EVERYTHING SAME AS YOUR CSS
+   ONLY caret styles are REMOVED */
+
+.sentence {
+  height: 10rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: -0.12em;
+  word-spacing: 0.1em;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.sentence span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.08em 0.14em;
+  border-radius: 4px;
+}
+
+.sentence span.correct {
+  background: #c7f0d8;
+}
+
+.sentence span.wrong {
+  background: #fee2e2;
+}
+
+.sentence span.pending {
+  color: #9ca3af;
+}
+
