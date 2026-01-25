@@ -7,6 +7,7 @@ import {
   ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -18,6 +19,7 @@ type Difficulty = 'easy' | 'medium' | 'hard';
   styleUrls: ['./typing.component.css'],
 })
 export class TypingComponent implements OnInit, OnDestroy {
+   constructor(private router: Router) {}
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
@@ -181,6 +183,7 @@ export class TypingComponent implements OnInit, OnDestroy {
   restartTest() {
     if (this.authMode === 'guest') {
       alert('Please login to continue');
+      this.router.navigate(['/typing']);
       return;
     }
     this.startGame();
