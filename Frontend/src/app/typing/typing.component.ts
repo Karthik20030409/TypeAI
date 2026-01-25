@@ -42,17 +42,7 @@ export class TypingComponent implements OnInit, OnDestroy {
   guestLocked = false;
 
   ngOnInit() {
-    this.authMode = (localStorage.getItem('authMode') as any) || 'guest';
-
-    if (
-      this.authMode === 'guest' &&
-      localStorage.getItem('guestPlayed') === 'true'
-    ) {
-      this.guestLocked = true;
-      this.finished = true;
-      return;
-    }
-
+    
     this.startGame();
   }
 
@@ -109,10 +99,7 @@ export class TypingComponent implements OnInit, OnDestroy {
     clearInterval(this.interval);
 
     // 🔒 Lock guest after first match
-    if (this.authMode === 'guest') {
-      localStorage.setItem('guestPlayed', 'true');
-      this.guestLocked = true;
-    }
+    
   }
 
   @HostListener('window:keydown', ['$event'])
