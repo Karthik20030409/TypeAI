@@ -4,7 +4,10 @@ const jwt = require("jsonwebtoken");
 const { isStrongPassword } = require("../utils/passwordValidator");
 const { generateOtp } = require("../utils/otp");
 
-// EMAIL SIGNUP
+// SAFE JWT SECRET (fallback for dev)
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_key";
+
+// EMAIL SIGNUP (EMAIL-OPTIONAL FLOW)
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -34,17 +37,19 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
       provider: "local",
       emailOtp: otp,
-      emailOtpExpires: Date.now() + 10 * 60 * 1000
+      emailOtpExpires: Date.now() + 10 * 60 * 1000,
+      isEmailVerified: false
     });
 
-    // TEMP: OTP shown in server console
-    console.log("EMAIL OTP:", otp);
+    // ✅ DEV MODE: OTP logged instead of email
+    console.log(`OTP for ${email}:`, otp);
 
     res.status(201).json({
       success: true,
       message: "Signup successful. Please verify email using OTP"
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Signup failed" });
   }
 };
@@ -54,15 +59,16 @@ exports.verifyEmailOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    if (
-      user.emailOtp !== otp ||
-      user.emailOtpExpires < Date.now()
-    ) {
+    if (user.emailOtp !== otp || user.emailOtpExpires < Date.now()) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
@@ -73,7 +79,7 @@ exports.verifyEmailOtp = async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 
@@ -83,6 +89,7 @@ exports.verifyEmailOtp = async (req, res) => {
       token
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "OTP verification failed" });
   }
 };
