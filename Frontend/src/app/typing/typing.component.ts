@@ -7,7 +7,6 @@ import {
   ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -19,7 +18,6 @@ type Difficulty = 'easy' | 'medium' | 'hard';
   styleUrls: ['./typing.component.css'],
 })
 export class TypingComponent implements OnInit, OnDestroy {
-   constructor(private router: Router) {}
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
@@ -37,12 +35,7 @@ export class TypingComponent implements OnInit, OnDestroy {
   mistakes = 0;
   finished = false;
 
-  // 🔐 AUTH STATE
-  authMode: 'logged' | 'guest' = 'guest';
-  guestLocked = false;
-
   ngOnInit() {
-    
     this.startGame();
   }
 
@@ -97,20 +90,19 @@ export class TypingComponent implements OnInit, OnDestroy {
     if (this.finished) return;
     this.finished = true;
     clearInterval(this.interval);
-
-    // 🔒 Lock guest after first match
-    
   }
 
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
 
-    if (this.guestLocked) return;
-    if (event.key === ' ') event.preventDefault();
     if (this.finished || this.timeLeft <= 0) return;
+
+    // ⛔ prevent spacebar / browser effects
+    if (event.key === ' ') event.preventDefault();
 
     this.startTimer();
 
+    // BACKSPACE
     if (event.key === 'Backspace' && this.index > 0) {
       this.index--;
       this.letters[this.index].status = 'pending';
@@ -118,13 +110,24 @@ export class TypingComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // ignore non-character keys
     if (event.key.length !== 1) return;
 
     const current = this.letters[this.index];
     if (!current) return;
 
-    current.status = event.key === current.char ? 'correct' : 'wrong';
-    if (current.status === 'wrong') this.mistakes++;
+    // ✅ NORMALIZED COMPARISON (THE REAL FIX)
+    const typedChar =
+      event.key === ' ' ? ' ' : event.key.toLowerCase();
+
+    const expectedChar = current.char.toLowerCase();
+
+    if (typedChar === expectedChar) {
+      current.status = 'correct';
+    } else {
+      current.status = 'wrong';
+      this.mistakes++;
+    }
 
     this.index++;
     this.autoScroll();
@@ -137,10 +140,10 @@ export class TypingComponent implements OnInit, OnDestroy {
   autoScroll() {
     requestAnimationFrame(() => {
       const container = this.sentenceBox.nativeElement;
-      const caret = container.querySelector('.caret') as HTMLElement;
-      if (!caret) return;
+      const active = container.querySelector('.active') as HTMLElement;
+      if (!active) return;
 
-      caret.scrollIntoView({
+      active.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest'
       });
@@ -162,17 +165,7 @@ export class TypingComponent implements OnInit, OnDestroy {
   }
 
   setDifficulty(level: Difficulty) {
-    if (this.guestLocked) return;
     this.difficulty = level;
-    this.startGame();
-  }
-
-  restartTest() {
-    if (this.authMode === 'guest') {
-      alert('Please login to continue');
-      this.router.navigate(['/typing']);
-      return;
-    }
     this.startGame();
   }
 }

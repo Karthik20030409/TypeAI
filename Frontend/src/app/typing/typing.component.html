@@ -1,6 +1,6 @@
 <div class="app">
   <header class="header">
-    <div class="logo">TYPE•AI</div>
+    <div class="logo">KEYMETRICS</div>
     <div class="nav-actions">
       <i class="pi pi-bell nav-icon"></i>
       <i class="pi pi-user nav-icon profile"></i>
@@ -32,11 +32,11 @@
               *ngFor="let l of letters; let i = index"
               [class.pending]="l.status==='pending'"
               [class.correct]="l.status==='correct'"
-              [class.wrong]="l.status==='wrong'">
-
-              <span class="caret" *ngIf="i === index">|</span>
+              [class.wrong]="l.status==='wrong'"
+              [class.active]="i === index">
 
               {{ l.char === ' ' ? '\u00A0' : l.char }}
+
             </span>
           </div>
 
