@@ -7,6 +7,7 @@ import {
   ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+//import { TypingService } from '../Services/typing.service';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -18,6 +19,8 @@ type Difficulty = 'easy' | 'medium' | 'hard';
   styleUrls: ['./typing.component.css'],
 })
 export class TypingComponent implements OnInit, OnDestroy {
+
+  //constructor(private typingService: TypingService) {}
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
@@ -35,6 +38,8 @@ export class TypingComponent implements OnInit, OnDestroy {
   mistakes = 0;
   finished = false;
 
+  /* ================= LIFECYCLE ================= */
+
   ngOnInit() {
     this.startGame();
   }
@@ -42,6 +47,8 @@ export class TypingComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     clearInterval(this.interval);
   }
+
+  /* ================= GAME SETUP ================= */
 
   startGame() {
     clearInterval(this.interval);
@@ -76,28 +83,47 @@ export class TypingComponent implements OnInit, OnDestroy {
     }));
   }
 
+  /* ================= TIMER ================= */
+
   startTimer() {
     if (this.timerStarted) return;
-    this.timerStarted = true;
 
+    this.timerStarted = true;
     this.interval = setInterval(() => {
       this.timeLeft--;
-      if (this.timeLeft <= 0) this.finishTest();
+      if (this.timeLeft <= 0) {
+        this.finishTest();
+      }
     }, 1000);
   }
 
+  /* ================= FINISH ================= */
+
   finishTest() {
     if (this.finished) return;
+
     this.finished = true;
     clearInterval(this.interval);
+
+    // ✅ API CALL (SERVICE)
+    // this.typingService.saveTypingResult({
+    //   accuracy: this.accuracy,
+    //   completion: this.completion,
+    //   timeTaken: this.timeTaken
+    // }).subscribe({
+    //   next: (res) => console.log('API Success:', res),
+    //   error: (err) => console.error('API Error:', err)
+    // });
   }
+
+  /* ================= INPUT ================= */
 
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
 
-    if (this.finished || this.timeLeft <= 0) return;
+    if (this.finished) return;
 
-    // ⛔ prevent spacebar / browser effects
+    // prevent browser scroll on space
     if (event.key === ' ') event.preventDefault();
 
     this.startTimer();
@@ -116,10 +142,8 @@ export class TypingComponent implements OnInit, OnDestroy {
     const current = this.letters[this.index];
     if (!current) return;
 
-    // ✅ NORMALIZED COMPARISON (THE REAL FIX)
-    const typedChar =
-      event.key === ' ' ? ' ' : event.key.toLowerCase();
-
+    // ✅ NORMALIZED COMPARISON
+    const typedChar = event.key.toLowerCase();
     const expectedChar = current.char.toLowerCase();
 
     if (typedChar === expectedChar) {
@@ -137,9 +161,13 @@ export class TypingComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* ================= SCROLL ================= */
+
   autoScroll() {
     requestAnimationFrame(() => {
-      const container = this.sentenceBox.nativeElement;
+      const container = this.sentenceBox?.nativeElement;
+      if (!container) return;
+
       const active = container.querySelector('.active') as HTMLElement;
       if (!active) return;
 
@@ -149,6 +177,8 @@ export class TypingComponent implements OnInit, OnDestroy {
       });
     });
   }
+
+  /* ================= METRICS ================= */
 
   get accuracy() {
     return this.index === 0
