@@ -1,18 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { TypingService } from '../Services/typing.service'; // ✅ CASE-SENSITIVE PATH
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule], // ✅ RouterModule added
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css'],
 })
 export class LandingComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private typingService: TypingService
+  ) {}
 
   authMode: 'login' | 'signup' | 'forgot' = 'login';
 
@@ -23,7 +27,9 @@ export class LandingComponent implements OnInit {
   email = '';
   password = '';
 
+  // ✅ HTML depends on this
   errors: any = {};
+
   showSettings = false;
 
   typingText = '';
@@ -41,112 +47,90 @@ export class LandingComponent implements OnInit {
     type: 'success' as 'success' | 'error'
   };
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.typeText();
-  }
-
-  /* ================= VALIDATION ================= */
-
-  private isValidEmail(email: string): boolean {
-    return email.includes('@') && email.includes('.');
-  }
-
-  private isValidPassword(password: string): boolean {
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[@$!%*?&]/.test(password);
-    return password.length >= 8 && hasUpper && hasLower && hasNumber && hasSpecial;
   }
 
   /* ================= AUTH ================= */
 
-  authenticate() {
+  authenticate(): void {
+    this.errors = {};
 
-    // NAME (SIGNUP)
-    if (this.authMode === 'signup' && !this.name.trim()) {
+    if (!this.name.trim()) {
+      this.errors.name = 'Name is required';
       this.showToast('Please enter the name', 'error');
       return;
     }
 
-    // EMAIL
     if (!this.email.trim()) {
+      this.errors.email = 'Email is required';
       this.showToast('Please enter the email', 'error');
       return;
     }
 
-    if (!this.isValidEmail(this.email)) {
-      this.showToast('Invalid email. Please enter a valid email', 'error');
-      return;
-    }
-
-    // PASSWORD
     if (!this.password.trim()) {
+      this.errors.password = 'Password is required';
       this.showToast('Please enter the password', 'error');
       return;
     }
 
-    if (!this.isValidPassword(this.password)) {
-      this.showToast(
-        'Invalid password. Password must contain at least 1 uppercase, 1 lowercase, 1 number, 1 special character and be at least 8 characters long.',
-        'error'
-      );
-      return;
-    }
-
-    // SUCCESS
-    this.isAuthenticated = true;
-
-    this.showToast(
-      this.authMode === 'login'
-        ? 'Logged in successfully'
-        : 'Account created successfully',
-      'success'
-    );
+    // 🔗 BACKEND CALL
+    this.typingService.signup({
+      username: this.name,
+      email: this.email,
+      password: this.password
+    }).subscribe({
+      next: () => {
+        this.showToast(
+          'Signup successful. Check backend console for OTP',
+          'success'
+        );
+      },
+      error: (err) => {
+        this.showToast(
+          err.error?.message || 'Signup failed',
+          'error'
+        );
+      }
+    });
   }
 
-  /* ================= ACTIONS ================= */
-
-  continueAsGuest() {
+  continueAsGuest(): void {
     this.isGuest = true;
     this.showToast('Logged in as GUEST', 'success');
   }
 
-  startTyping() {
-    if (!this.isAuthenticated && !this.isGuest) {
+  startTyping(): void {
+    if (!this.isGuest && !this.isAuthenticated) {
       this.showToast('Please login or continue as guest', 'error');
       return;
     }
-
     this.router.navigate(['/typing']);
   }
 
-  forgotPassword() {
+  forgotPassword(): void {
     this.authMode = 'forgot';
   }
 
-  toggleSettings() {
+  toggleSettings(): void {
     this.showSettings = !this.showSettings;
   }
 
   /* ================= TOAST ================= */
 
-  showToast(message: string, type: 'success' | 'error' = 'success') {
+  showToast(message: string, type: 'success' | 'error' = 'success'): void {
     this.toast.message = message;
     this.toast.type = type;
     this.toast.show = true;
 
     setTimeout(() => {
       this.toast.show = false;
-      if (type === 'success') {
-        this.router.navigate(['/typing']);
-      }
-    }, type === 'success' ? 1000 : 2000);
+    }, 2000);
   }
 
   /* ================= TYPING EFFECT ================= */
 
-  typeText() {
+  typeText(): void {
     const phrase = this.phrases[this.phraseIndex];
     if (this.charIndex < phrase.length) {
       this.typingText += phrase[this.charIndex++];
@@ -156,7 +140,7 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  eraseText() {
+  eraseText(): void {
     if (this.charIndex > 0) {
       this.typingText = this.typingText.slice(0, -1);
       this.charIndex--;

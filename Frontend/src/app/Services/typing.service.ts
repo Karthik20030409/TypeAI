@@ -7,17 +7,15 @@ import { Observable } from 'rxjs';
 })
 export class TypingService {
 
-  // Fake API for now (works without backend)
-  private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  private apiUrl = 'http://localhost:5000/api/auth';
 
   constructor(private http: HttpClient) {}
 
-  // 👉 FUNCTION CLIENT IS TALKING ABOUT
-  saveTypingResult(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+  signup(data: { username: string; email: string; password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/signup`, data);
   }
 
-  getSampleData(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  verifyOtp(data: { email: string; otp: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-email`, data);
   }
 }
