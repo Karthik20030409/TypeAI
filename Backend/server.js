@@ -5,6 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const authRoutes = require("./routes/auth.routes");
+const textRoutes=require("./routes/Text.routes");
 
 const app = express(); // ✅ app MUST be created first
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use('/api/text', textRoutes);
 
 // Health check
 app.get("/", (req, res) => {

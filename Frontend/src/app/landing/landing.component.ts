@@ -12,16 +12,17 @@ import { TypingService } from '../Services/typing.service'; // ✅ CASE-SENSITIV
   styleUrls: ['./landing.component.css'],
 })
 export class LandingComponent implements OnInit {
-
   constructor(
     private router: Router,
-    private typingService: TypingService
+    private typingService: TypingService,
   ) {}
 
   authMode: 'login' | 'signup' | 'forgot' = 'login';
 
   isAuthenticated = false;
   isGuest = false;
+  authStep: 'form' | 'otp' = 'form';
+  otp = '';
 
   name = '';
   email = '';
@@ -44,7 +45,7 @@ export class LandingComponent implements OnInit {
   toast = {
     show: false,
     message: '',
-    type: 'success' as 'success' | 'error'
+    type: 'success' as 'success' | 'error',
   };
 
   ngOnInit(): void {
@@ -75,29 +76,31 @@ export class LandingComponent implements OnInit {
     }
 
     // 🔗 BACKEND CALL
-    this.typingService.signup({
-      username: this.name,
-      email: this.email,
-      password: this.password
-    }).subscribe({
-      next: () => {
-        this.showToast(
-          'Signup successful. Check backend console for OTP',
-          'success'
-        );
-      },
-      error: (err) => {
-        this.showToast(
-          err.error?.message || 'Signup failed',
-          'error'
-        );
-      }
-    });
+    
+    this.typingService
+      .signup({
+        username: this.name,
+        email: this.email,
+        password: this.password,
+      })
+      .subscribe({
+        next: () => {
+          this.showToast(
+            'Signup successful. Check backend console for OTP',
+            'success',
+          );
+          this.authStep = 'otp';
+        },
+        error: (err) => {
+          this.showToast(err.error?.message || 'Signup failed', 'error');
+        },
+      });
   }
 
   continueAsGuest(): void {
     this.isGuest = true;
     this.showToast('Logged in as GUEST', 'success');
+    this.router.navigate(['/typing']);
   }
 
   startTyping(): void {
@@ -150,4 +153,36 @@ export class LandingComponent implements OnInit {
       this.typeText();
     }
   }
+  verifyOtp() {
+  if (!this.otp || this.otp.length !== 6) {
+    this.errors.otp = 'Enter a valid 6-digit OTP';
+    return;
+  }
+
+  const payload = {
+    email: this.email,
+    otp: this.otp
+  };
+
+  this.typingService.verifyOtp(payload).subscribe({
+    next: (res) => {
+      // ✅ OTP verified successfully
+      // Example: save token & redirect
+      if (res.token) {
+        localStorage.setItem('token', res.token);
+      }
+      this.showToast(
+            'Signup successful.',
+            'success',
+          );
+      // redirect / close modal / navigate
+      this.router.navigate(['/typing']);
+    },
+    error: (err) => {
+      this.errors.otp = err.error?.message || 'Invalid OTP';
+    }
+  });
+}
+resendOtp(){}
+  
 }

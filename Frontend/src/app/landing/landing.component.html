@@ -35,40 +35,83 @@
 
     <!-- AUTH -->
     <aside class="auth-panel">
-      <div class="tabs">
-        <span [class.active]="authMode === 'login'" (click)="authMode = 'login'"
-          >Login</span
-        >
-        <span
-          [class.active]="authMode === 'signup'"
-          (click)="authMode = 'signup'"
-          >Sign Up</span
-        >
-      </div>
 
-      <div *ngIf="authMode === 'signup'">
-        <label>Name</label>
-        <input [(ngModel)]="name" />
-        <div class="error">{{ errors.name }}</div>
-      </div>
+  <!-- TABS (only show before OTP) -->
+  <div class="tabs" *ngIf="authStep === 'form'">
+    <span
+      [class.active]="authMode === 'login'"
+      (click)="authMode = 'login'">
+      Login
+    </span>
+    <span
+      [class.active]="authMode === 'signup'"
+      (click)="authMode = 'signup'">
+      Sign Up
+    </span>
+  </div>
 
-      <label>Email</label>
-      <input [(ngModel)]="email" />
-      <div class="error">{{ errors.email }}</div>
+  <!-- LOGIN / SIGNUP FORM -->
+  <ng-container *ngIf="authStep === 'form'">
 
-      <label>Password</label>
+    <div *ngIf="authMode === 'signup'">
+      <label>
+        Name
+        <input [(ngModel)]="name" autocomplete="name" />
+      </label>
+      <div class="error">{{ errors.name }}</div>
+    <label>Email</label>
+    <input type="email" autocomplete="email" [(ngModel)]="email" />
+    <div class="error">{{ errors.email }}</div>      Email
+      <input type="email" autocomplete="email" [(ngModel)]="email" />
+    </label>
+    <div class="error">{{ errors.email }}</div>
+
+    <label>
+      Password
       <input type="password" [(ngModel)]="password" />
-      <div class="error">{{ errors.password }}</div>
+    </label>
+    <div class="error">{{ errors.password }}</div>
+    <button class="primary btn-animated login" (click)="authenticate()">
+      {{ authMode === "login" ? "Log In" : "Create Account" }}
+    </button>
 
-      <button class="primary btn-animated login" (click)="authenticate()">
-        {{ authMode === "login" ? "Log In" : "Create Account" }}
-      </button>
+    <div class="links">
+      <span (click)="forgotPassword()">Forgot Password?</span>
+      <span (click)="continueAsGuest()">Continue as Guest</span>
+    </div>
 
-      <div class="links">
-        <span (click)="forgotPassword()">Forgot Password?</span>
-        <span (click)="continueAsGuest()">Continue as Guest</span>
-      </div>
-    </aside>
+  </ng-container>
+
+  <!-- OTP VERIFICATION -->
+  <ng-container *ngIf="authStep === 'otp'">
+
+    <h3 class="otp-title">Verify OTP</h3>
+    <p class="otp-sub">
+      We've sent a 6-digit code to <strong>{{ email }}</strong>
+    </p>
+
+    <label>OTP</label>
+    <input
+      maxlength="6"
+      inputmode="numeric"
+      [(ngModel)]="otp"
+      placeholder="Enter OTP" />
+
+    <div class="error">{{ errors.otp }}</div>
+
+    <button class="primary btn-animated login" (click)="verifyOtp()">
+      Verify
+    </button>
+
+    <div class="links otp-links">
+      <span (click)="resendOtp()">Resend OTP</span>
+      <span (click)="authStep='form'">Change Email</span>
+    </div>
+
+  </ng-container>
+
+</aside>
+
   </section>
 </div>
 <div
