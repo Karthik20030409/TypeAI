@@ -84,11 +84,15 @@ async function getRandomSentence() {
 function applyDifficulty(text, level) {
   let output = text;
 
-  if (level === "easy") {
-    output = output
-      .toLowerCase()
-      .replace(/[.,!?;:"'()-]/g, "");
-  }
+ if (level === "easy") {
+  output = output
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 
   if (level === "medium") {
     output = output.toLowerCase();
