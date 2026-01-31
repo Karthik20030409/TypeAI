@@ -53,28 +53,38 @@
   <!-- LOGIN / SIGNUP FORM -->
   <ng-container *ngIf="authStep === 'form'">
 
+    <!-- NAME (Signup only) -->
     <div *ngIf="authMode === 'signup'">
       <label>
         Name
         <input [(ngModel)]="name" autocomplete="name" />
       </label>
       <div class="error">{{ errors.name }}</div>
-    <label>Email</label>
-    <input type="email" autocomplete="email" [(ngModel)]="email" />
-    <div class="error">{{ errors.email }}</div>      Email
-      <input type="email" autocomplete="email" [(ngModel)]="email" />
+    </div>
+
+    <!-- EMAIL -->
+    <label>
+      Email
+      <input
+        type="email"
+        autocomplete="email"
+        [(ngModel)]="email" />
     </label>
     <div class="error">{{ errors.email }}</div>
 
+    <!-- PASSWORD -->
     <label>
       Password
       <input type="password" [(ngModel)]="password" />
     </label>
     <div class="error">{{ errors.password }}</div>
+
+    <!-- ACTION -->
     <button class="primary btn-animated login" (click)="authenticate()">
-      {{ authMode === "login" ? "Log In" : "Create Account" }}
+      {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
     </button>
 
+    <!-- LINKS -->
     <div class="links">
       <span (click)="forgotPassword()">Forgot Password?</span>
       <span (click)="continueAsGuest()">Continue as Guest</span>
@@ -90,12 +100,14 @@
       We've sent a 6-digit code to <strong>{{ email }}</strong>
     </p>
 
-    <label>OTP</label>
-    <input
-      maxlength="6"
-      inputmode="numeric"
-      [(ngModel)]="otp"
-      placeholder="Enter OTP" />
+    <label>
+      OTP
+      <input
+        maxlength="6"
+        inputmode="numeric"
+        [(ngModel)]="otp"
+        placeholder="Enter OTP" />
+    </label>
 
     <div class="error">{{ errors.otp }}</div>
 
@@ -105,7 +117,7 @@
 
     <div class="links otp-links">
       <span (click)="resendOtp()">Resend OTP</span>
-      <span (click)="authStep='form'">Change Email</span>
+      <span (click)="authStep = 'form'">Change Email</span>
     </div>
 
   </ng-container>

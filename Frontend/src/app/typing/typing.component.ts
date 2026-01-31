@@ -7,7 +7,8 @@ import {
   ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-//import { TypingService } from '../Services/typing.service';
+
+import { TypingService } from '../Services/typing.service';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -20,7 +21,7 @@ type Difficulty = 'easy' | 'medium' | 'hard';
 })
 export class TypingComponent implements OnInit, OnDestroy {
 
-  //constructor(private typingService: TypingService) {}
+  constructor(private typingService: TypingService) {}
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
@@ -51,37 +52,34 @@ export class TypingComponent implements OnInit, OnDestroy {
   /* ================= GAME SETUP ================= */
 
   startGame() {
-    clearInterval(this.interval);
+  clearInterval(this.interval);
 
-    this.timerStarted = false;
-    this.finished = false;
-    this.index = 0;
-    this.mistakes = 0;
+  this.timerStarted = false;
+  this.finished = false;
+  this.index = 0;
+  this.mistakes = 0;
 
-    const pool = [
-      'focus','discipline','clarity','control','precision','growth',
-      'momentum','confidence','flow','patience','mastery','calm'
-    ];
+  this.totalTime =
+    this.difficulty === 'easy' ? 45 :
+    this.difficulty === 'medium' ? 75 : 120;
 
-    const wordCount =
-      this.difficulty === 'easy' ? 30 :
-      this.difficulty === 'medium' ? 70 : 120;
+  this.timeLeft = this.totalTime;
 
-    this.totalTime =
-      this.difficulty === 'easy' ? 45 :
-      this.difficulty === 'medium' ? 75 : 120;
+  // 🚀 Service call
+  this.typingService.generateText(this.difficulty).subscribe({
+    next: (res) => {
+      this.sentence = res.text;
 
-    this.timeLeft = this.totalTime;
-
-    this.sentence = Array.from({ length: wordCount }, () =>
-      pool[Math.floor(Math.random() * pool.length)]
-    ).join(' ');
-
-    this.letters = this.sentence.split('').map(c => ({
-      char: c,
-      status: 'pending'
-    }));
-  }
+      this.letters = this.sentence.split('').map(c => ({
+        char: c,
+        status: 'pending'
+      }));
+    },
+    error: (err) => {
+      console.error('Text generation failed', err);
+    }
+  });
+}
 
   /* ================= TIMER ================= */
 
