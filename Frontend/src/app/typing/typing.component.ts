@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { TypingService } from '../Services/typing.service';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
-type GameMode = 'timed' | 'zen' | 'threeMistakes' | 'suddenDeath' | 'memory';
+type GameMode = 'timed' | 'zen' | 'threeMistakes' | 'suddenDeath';
 type TimedLevel = 'easy' | 'medium' | 'hard';
 
 @Component({
@@ -26,21 +26,14 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
-  /* ================= CONFIG ================= */
-
   difficulty: Difficulty = 'easy';
   gameMode: GameMode = 'timed';
-
   timedLevel: TimedLevel = 'easy';
-
-  /* ================= TIMER ================= */
 
   totalTime = 60;
   timeLeft = 60;
   timerStarted = false;
   interval: any;
-
-  /* ================= GAME STATE ================= */
 
   sentence = '';
   letters: { char: string; status: 'pending' | 'correct' | 'wrong' }[] = [];
@@ -49,47 +42,32 @@ export class TypingComponent implements OnInit, OnDestroy {
   mistakes = 0;
   finished = false;
 
-  /* ================= MEMORY MODE ================= */
-
-  hideText = false;
-  memoryTimeout: any;
-
-  /* ================= LIFECYCLE ================= */
-
   ngOnInit() {
     this.startGame();
   }
 
   ngOnDestroy() {
     clearInterval(this.interval);
-    clearTimeout(this.memoryTimeout);
   }
-
-  /* ================= GAME SETUP ================= */
 
   startGame() {
     clearInterval(this.interval);
-    clearTimeout(this.memoryTimeout);
 
     this.index = 0;
     this.mistakes = 0;
     this.finished = false;
     this.timerStarted = false;
-    this.hideText = false;
 
-    // TIMER SETUP
     if (this.gameMode === 'timed') {
       this.totalTime =
         this.timedLevel === 'easy' ? 60 :
         this.timedLevel === 'medium' ? 90 : 120;
-
       this.timeLeft = this.totalTime;
     } else {
       this.totalTime = 0;
       this.timeLeft = 0;
     }
 
-    // TEXT GENERATION
     this.typingService.generateText(this.difficulty).subscribe({
       next: res => {
         this.sentence = res.text;
@@ -97,23 +75,13 @@ export class TypingComponent implements OnInit, OnDestroy {
           char: c,
           status: 'pending'
         }));
-
-        // MEMORY MODE
-        if (this.gameMode === 'memory') {
-          this.memoryTimeout = setTimeout(() => {
-            this.hideText = true;
-          }, 5000);
-        }
       },
       error: err => console.error(err)
     });
   }
 
-  /* ================= TIMER ================= */
-
   startTimer() {
-    if (this.timerStarted) return;
-    if (this.gameMode !== 'timed') return;
+    if (this.timerStarted || this.gameMode !== 'timed') return;
 
     this.timerStarted = true;
     this.interval = setInterval(() => {
@@ -122,14 +90,11 @@ export class TypingComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  /* ================= INPUT ================= */
-
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
     if (this.finished) return;
 
     if (event.key === ' ') event.preventDefault();
-
     this.startTimer();
 
     if (event.key === 'Backspace' && this.index > 0) {
@@ -161,13 +126,9 @@ export class TypingComponent implements OnInit, OnDestroy {
     if (this.index === this.letters.length) this.finishTest();
   }
 
-  /* ================= AUTO SCROLL ================= */
-
   autoScroll() {
     requestAnimationFrame(() => {
-      const container = this.sentenceBox?.nativeElement;
-      if (!container) return;
-
+      const container = this.sentenceBox.nativeElement;
       const active = container.querySelector('.active') as HTMLElement;
       if (!active) return;
 
@@ -182,16 +143,11 @@ export class TypingComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ================= FINISH ================= */
-
   finishTest() {
     if (this.finished) return;
     this.finished = true;
     clearInterval(this.interval);
-    clearTimeout(this.memoryTimeout);
   }
-
-  /* ================= METRICS ================= */
 
   get accuracy() {
     return this.index === 0
@@ -208,8 +164,6 @@ export class TypingComponent implements OnInit, OnDestroy {
       ? this.totalTime - this.timeLeft
       : 0;
   }
-
-  /* ================= SETTERS ================= */
 
   setDifficulty(level: Difficulty) {
     this.difficulty = level;

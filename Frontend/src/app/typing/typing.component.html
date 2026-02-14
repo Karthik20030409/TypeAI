@@ -12,29 +12,34 @@
     <main class="typing-wrapper">
 
       <div class="typing-top">
+
+        <!-- DIFFICULTY -->
+        <div class="difficulty">
+          <button [class.active]="difficulty==='easy'" (click)="setDifficulty('easy')">Easy</button>
+          <button [class.active]="difficulty==='medium'" (click)="setDifficulty('medium')">Medium</button>
+          <button [class.active]="difficulty==='hard'" (click)="setDifficulty('hard')">Hard</button>
+        </div>
+
+        <!-- MODES (PLACED BETWEEN DIFFICULTY & TIMER) -->
         <div class="difficulty">
           <button [class.active]="gameMode==='timed'" (click)="setGameMode('timed')">Timed</button>
           <button [class.active]="gameMode==='zen'" (click)="setGameMode('zen')">Zen</button>
           <button [class.active]="gameMode==='threeMistakes'" (click)="setGameMode('threeMistakes')">3 Mistakes</button>
           <button [class.active]="gameMode==='suddenDeath'" (click)="setGameMode('suddenDeath')">Sudden Death</button>
-          <button [class.active]="gameMode==='memory'" (click)="setGameMode('memory')">Memory</button>
         </div>
 
-         <div class="difficulty" *ngIf="gameMode === 'timed'">
-    <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">
-      Easy · 60s
-    </button>
-    <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">
-      Medium · 90s
-    </button>
-    <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">
-      Hard · 120s
-    </button>
-  </div>
+        <!-- TIMED SUB LEVELS -->
+        <div class="difficulty" *ngIf="gameMode === 'timed'">
+          <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">Easy · 60s</button>
+          <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">Medium · 90s</button>
+          <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">Hard · 120s</button>
+        </div>
 
+        <!-- TIMER -->
         <div class="timer" *ngIf="gameMode === 'timed'">
           {{ timeLeft }}<span>s</span>
         </div>
+
       </div>
 
       <div class="typing-card">
@@ -48,9 +53,7 @@
               [class.correct]="l.status==='correct'"
               [class.wrong]="l.status==='wrong'"
               [class.active]="i === index">
-
               {{ l.char === ' ' ? '\u00A0' : l.char }}
-
             </span>
           </div>
 
@@ -92,9 +95,7 @@
 
       </div>
 
-      <button class="restart-btn" (click)="startGame()">
-        ⟳ Restart Test
-      </button>
+      <button class="restart-btn" (click)="startGame()">⟳ Restart Test</button>
 
     </main>
   </div>
