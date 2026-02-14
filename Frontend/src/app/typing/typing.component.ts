@@ -7,10 +7,11 @@ import {
   ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { TypingService } from '../Services/typing.service';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
+type GameMode = 'timed' | 'zen' | 'threeMistakes' | 'suddenDeath' | 'memory';
+type TimedLevel = 'easy' | 'medium' | 'hard';
 
 @Component({
   selector: 'app-typing',
@@ -25,12 +26,21 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
-  difficulty: Difficulty = 'easy';
+  /* ================= CONFIG ================= */
 
-  timeLeft = 0;
-  totalTime = 0;
+  difficulty: Difficulty = 'easy';
+  gameMode: GameMode = 'timed';
+
+  timedLevel: TimedLevel = 'easy';
+
+  /* ================= TIMER ================= */
+
+  totalTime = 60;
+  timeLeft = 60;
   timerStarted = false;
   interval: any;
+
+  /* ================= GAME STATE ================= */
 
   sentence = '';
   letters: { char: string; status: 'pending' | 'correct' | 'wrong' }[] = [];
@@ -38,6 +48,11 @@ export class TypingComponent implements OnInit, OnDestroy {
   index = 0;
   mistakes = 0;
   finished = false;
+
+  /* ================= MEMORY MODE ================= */
+
+  hideText = false;
+  memoryTimeout: any;
 
   /* ================= LIFECYCLE ================= */
 
@@ -47,86 +62,76 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.interval);
+    clearTimeout(this.memoryTimeout);
   }
 
   /* ================= GAME SETUP ================= */
 
   startGame() {
-  clearInterval(this.interval);
+    clearInterval(this.interval);
+    clearTimeout(this.memoryTimeout);
 
-  this.timerStarted = false;
-  this.finished = false;
-  this.index = 0;
-  this.mistakes = 0;
+    this.index = 0;
+    this.mistakes = 0;
+    this.finished = false;
+    this.timerStarted = false;
+    this.hideText = false;
 
-  this.totalTime =
-    this.difficulty === 'easy' ? 45 :
-    this.difficulty === 'medium' ? 75 : 120;
+    // TIMER SETUP
+    if (this.gameMode === 'timed') {
+      this.totalTime =
+        this.timedLevel === 'easy' ? 60 :
+        this.timedLevel === 'medium' ? 90 : 120;
 
-  this.timeLeft = this.totalTime;
-
-  // 🚀 Service call
-  this.typingService.generateText(this.difficulty).subscribe({
-    next: (res) => {
-      this.sentence = res.text;
-
-      this.letters = this.sentence.split('').map(c => ({
-        char: c,
-        status: 'pending'
-      }));
-    },
-    error: (err) => {
-      console.error('Text generation failed', err);
+      this.timeLeft = this.totalTime;
+    } else {
+      this.totalTime = 0;
+      this.timeLeft = 0;
     }
-  });
-}
+
+    // TEXT GENERATION
+    this.typingService.generateText(this.difficulty).subscribe({
+      next: res => {
+        this.sentence = res.text;
+        this.letters = this.sentence.split('').map(c => ({
+          char: c,
+          status: 'pending'
+        }));
+
+        // MEMORY MODE
+        if (this.gameMode === 'memory') {
+          this.memoryTimeout = setTimeout(() => {
+            this.hideText = true;
+          }, 5000);
+        }
+      },
+      error: err => console.error(err)
+    });
+  }
 
   /* ================= TIMER ================= */
 
   startTimer() {
     if (this.timerStarted) return;
+    if (this.gameMode !== 'timed') return;
 
     this.timerStarted = true;
     this.interval = setInterval(() => {
       this.timeLeft--;
-      if (this.timeLeft <= 0) {
-        this.finishTest();
-      }
+      if (this.timeLeft <= 0) this.finishTest();
     }, 1000);
-  }
-
-  /* ================= FINISH ================= */
-
-  finishTest() {
-    if (this.finished) return;
-
-    this.finished = true;
-    clearInterval(this.interval);
-
-    // ✅ API CALL (SERVICE)
-    // this.typingService.saveTypingResult({
-    //   accuracy: this.accuracy,
-    //   completion: this.completion,
-    //   timeTaken: this.timeTaken
-    // }).subscribe({
-    //   next: (res) => console.log('API Success:', res),
-    //   error: (err) => console.error('API Error:', err)
-    // });
   }
 
   /* ================= INPUT ================= */
 
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
-
     if (this.finished) return;
 
-    // prevent browser scroll on space
     if (event.key === ' ') event.preventDefault();
 
     this.startTimer();
 
-    // BACKSPACE
     if (event.key === 'Backspace' && this.index > 0) {
       this.index--;
       this.letters[this.index].status = 'pending';
@@ -134,32 +139,29 @@ export class TypingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // ignore non-character keys
     if (event.key.length !== 1) return;
 
     const current = this.letters[this.index];
     if (!current) return;
 
-    // ✅ NORMALIZED COMPARISON
-    const typedChar = event.key.toLowerCase();
-    const expectedChar = current.char.toLowerCase();
-
-    if (typedChar === expectedChar) {
+    if (event.key.toLowerCase() === current.char.toLowerCase()) {
       current.status = 'correct';
     } else {
       current.status = 'wrong';
       this.mistakes++;
+
+      if (this.gameMode === 'suddenDeath') return this.finishTest();
+      if (this.gameMode === 'threeMistakes' && this.mistakes >= 3)
+        return this.finishTest();
     }
 
     this.index++;
     this.autoScroll();
 
-    if (this.index === this.letters.length) {
-      this.finishTest();
-    }
+    if (this.index === this.letters.length) this.finishTest();
   }
 
-  /* ================= SCROLL ================= */
+  /* ================= AUTO SCROLL ================= */
 
   autoScroll() {
     requestAnimationFrame(() => {
@@ -169,11 +171,24 @@ export class TypingComponent implements OnInit, OnDestroy {
       const active = container.querySelector('.active') as HTMLElement;
       if (!active) return;
 
-      active.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-      });
+      const top = active.offsetTop;
+      const bottom = top + active.offsetHeight;
+
+      if (top < container.scrollTop) {
+        container.scrollTop = top - 20;
+      } else if (bottom > container.scrollTop + container.clientHeight) {
+        container.scrollTop = bottom - container.clientHeight + 20;
+      }
     });
+  }
+
+  /* ================= FINISH ================= */
+
+  finishTest() {
+    if (this.finished) return;
+    this.finished = true;
+    clearInterval(this.interval);
+    clearTimeout(this.memoryTimeout);
   }
 
   /* ================= METRICS ================= */
@@ -189,11 +204,25 @@ export class TypingComponent implements OnInit, OnDestroy {
   }
 
   get timeTaken() {
-    return this.totalTime - this.timeLeft;
+    return this.gameMode === 'timed'
+      ? this.totalTime - this.timeLeft
+      : 0;
   }
+
+  /* ================= SETTERS ================= */
 
   setDifficulty(level: Difficulty) {
     this.difficulty = level;
+    this.startGame();
+  }
+
+  setGameMode(mode: GameMode) {
+    this.gameMode = mode;
+    this.startGame();
+  }
+
+  setTimedLevel(level: TimedLevel) {
+    this.timedLevel = level;
     this.startGame();
   }
 }
