@@ -3,7 +3,7 @@
     <div class="logo">KEYMETRICS</div>
     <div class="nav-actions">
       <i class="pi pi-bell nav-icon"></i>
-      <i class="pi pi-user nav-icon profile"></i>
+      <i class="pi pi-user nav-icon"></i>
       <i class="pi pi-cog nav-icon"></i>
     </div>
   </header>
@@ -11,31 +11,31 @@
   <div class="typing-app">
     <main class="typing-wrapper">
 
-      <div class="typing-top">
+      <!-- MODE DESCRIPTION -->
+      <div class="motivation-top">
+        {{ modeDescription }}
+      </div>
 
-        <!-- DIFFICULTY -->
-        <div class="difficulty">
-          <button [class.active]="difficulty==='easy'" (click)="setDifficulty('easy')">Easy</button>
-          <button [class.active]="difficulty==='medium'" (click)="setDifficulty('medium')">Medium</button>
-          <button [class.active]="difficulty==='hard'" (click)="setDifficulty('hard')">Hard</button>
+      <div class="typing-top three-zone">
+
+        <!-- LEFT: TIMED LEVELS -->
+        <div class="difficulty" *ngIf="gameMode === 'timed'">
+          <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">Easy</button>
+          <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">Medium</button>
+          <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">Hard</button>
         </div>
 
-        <!-- MODES (PLACED BETWEEN DIFFICULTY & TIMER) -->
-        <div class="difficulty">
+        <!-- CENTER: MODES -->
+        <div class="difficulty center">
           <button [class.active]="gameMode==='timed'" (click)="setGameMode('timed')">Timed</button>
           <button [class.active]="gameMode==='zen'" (click)="setGameMode('zen')">Zen</button>
           <button [class.active]="gameMode==='threeMistakes'" (click)="setGameMode('threeMistakes')">3 Mistakes</button>
           <button [class.active]="gameMode==='suddenDeath'" (click)="setGameMode('suddenDeath')">Sudden Death</button>
+          <button [class.active]="gameMode==='endless'" (click)="setGameMode('endless')">Endless</button>
+          <button [class.active]="gameMode==='accuracy'" (click)="setGameMode('accuracy')">Accuracy</button>
         </div>
 
-        <!-- TIMED SUB LEVELS -->
-        <div class="difficulty" *ngIf="gameMode === 'timed'">
-          <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">Easy · 60s</button>
-          <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">Medium · 90s</button>
-          <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">Hard · 120s</button>
-        </div>
-
-        <!-- TIMER -->
+        <!-- RIGHT: TIMER -->
         <div class="timer" *ngIf="gameMode === 'timed'">
           {{ timeLeft }}<span>s</span>
         </div>
@@ -45,7 +45,6 @@
       <div class="typing-card">
 
         <ng-container *ngIf="!finished; else resultView">
-
           <div class="sentence" #sentenceBox>
             <span
               *ngFor="let l of letters; let i = index"
@@ -57,10 +56,9 @@
             </span>
           </div>
 
-          <p class="hint" *ngIf="!timerStarted">
+          <p class="hint" *ngIf="!timerStarted && gameMode === 'timed'">
             Start typing to begin ⌨️
           </p>
-
         </ng-container>
 
         <ng-template #resultView>
@@ -82,7 +80,7 @@
               <p>Completion</p>
             </div>
 
-            <div class="meter">
+            <div class="meter" *ngIf="gameMode === 'timed'">
               <div class="circle"
                 [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
                 <span>{{ timeTaken }}s</span>

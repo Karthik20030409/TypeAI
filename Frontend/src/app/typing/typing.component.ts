@@ -9,8 +9,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { TypingService } from '../Services/typing.service';
 
-type Difficulty = 'easy' | 'medium' | 'hard';
-type GameMode = 'timed' | 'zen' | 'threeMistakes' | 'suddenDeath';
+type GameMode =
+  | 'timed'
+  | 'zen'
+  | 'threeMistakes'
+  | 'suddenDeath'
+  | 'endless'
+  | 'accuracy';
+
 type TimedLevel = 'easy' | 'medium' | 'hard';
 
 @Component({
@@ -26,7 +32,6 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   @ViewChild('sentenceBox') sentenceBox!: ElementRef<HTMLDivElement>;
 
-  difficulty: Difficulty = 'easy';
   gameMode: GameMode = 'timed';
   timedLevel: TimedLevel = 'easy';
 
@@ -42,7 +47,10 @@ export class TypingComponent implements OnInit, OnDestroy {
   mistakes = 0;
   finished = false;
 
+  modeDescription = '';
+
   ngOnInit() {
+    this.updateModeDescription();
     this.startGame();
   }
 
@@ -63,21 +71,35 @@ export class TypingComponent implements OnInit, OnDestroy {
         this.timedLevel === 'easy' ? 60 :
         this.timedLevel === 'medium' ? 90 : 120;
       this.timeLeft = this.totalTime;
-    } else {
-      this.totalTime = 0;
-      this.timeLeft = 0;
     }
 
-    this.typingService.generateText(this.difficulty).subscribe({
+    this.typingService.generateText('easy').subscribe({
       next: res => {
         this.sentence = res.text;
         this.letters = this.sentence.split('').map(c => ({
           char: c,
           status: 'pending'
         }));
+
+        // Reset scroll to top
+        setTimeout(() => {
+          this.sentenceBox?.nativeElement.scrollTo({ top: 0 });
+        });
       },
       error: err => console.error(err)
     });
+  }
+
+  updateModeDescription() {
+    const map: Record<GameMode, string> = {
+      timed: '⏱️ Timed Mode — Race against time. Speed + consistency wins.',
+      zen: '🧘 Zen Mode — No pressure. Type endlessly with calm focus.',
+      threeMistakes: '🎯 3 Mistakes — Precision challenge. Three errors and it ends.',
+      suddenDeath: '⚡ Sudden Death — One mistake = instant game over.',
+      endless: '♾️ Endless — Infinite text. Train stamina and flow.',
+      accuracy: '🎯 Accuracy Mode — No timer. Finish the text with maximum precision.'
+    };
+    this.modeDescription = map[this.gameMode];
   }
 
   startTimer() {
@@ -90,17 +112,67 @@ export class TypingComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  // 🔥 AUTO SCROLL LOGIC (THE FIX)
+  private scrollToActiveLetter() {
+    if (!this.sentenceBox) return;
+
+    const container = this.sentenceBox.nativeElement;
+    const activeSpan = container.children[this.index] as HTMLElement;
+
+    if (!activeSpan) return;
+
+    const spanTop = activeSpan.offsetTop;
+    const spanBottom = spanTop + activeSpan.offsetHeight;
+
+    const viewTop = container.scrollTop;
+    const viewBottom = viewTop + container.clientHeight;
+
+    if (spanBottom > viewBottom - 20) {
+      container.scrollTo({
+        top: spanBottom - container.clientHeight + 40,
+        behavior: 'smooth'
+      });
+    }
+
+    if (spanTop < viewTop + 20) {
+      container.scrollTo({
+        top: spanTop - 20,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // 🔥 KEYBOARD HANDLING
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
+
+    if (event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA'
+    ) {
+      return;
+    }
+
     if (this.finished) return;
 
-    if (event.key === ' ') event.preventDefault();
-    this.startTimer();
+    if (this.gameMode === 'timed') {
+      this.startTimer();
+    }
 
-    if (event.key === 'Backspace' && this.index > 0) {
-      this.index--;
-      this.letters[this.index].status = 'pending';
-      this.autoScroll();
+    // BACKSPACE
+    if (event.key === 'Backspace') {
+      if (this.index > 0) {
+        this.index--;
+        this.letters[this.index].status = 'pending';
+        this.scrollToActiveLetter();
+      }
       return;
     }
 
@@ -109,38 +181,31 @@ export class TypingComponent implements OnInit, OnDestroy {
     const current = this.letters[this.index];
     if (!current) return;
 
-    if (event.key.toLowerCase() === current.char.toLowerCase()) {
+    if (event.key === current.char) {
       current.status = 'correct';
     } else {
       current.status = 'wrong';
       this.mistakes++;
 
-      if (this.gameMode === 'suddenDeath') return this.finishTest();
-      if (this.gameMode === 'threeMistakes' && this.mistakes >= 3)
-        return this.finishTest();
+      if (this.gameMode === 'suddenDeath') {
+        this.finishTest();
+        return;
+      }
+
+      if (this.gameMode === 'threeMistakes' && this.mistakes >= 3) {
+        this.finishTest();
+        return;
+      }
     }
 
     this.index++;
-    this.autoScroll();
+    this.scrollToActiveLetter();
 
-    if (this.index === this.letters.length) this.finishTest();
-  }
-
-  autoScroll() {
-    requestAnimationFrame(() => {
-      const container = this.sentenceBox.nativeElement;
-      const active = container.querySelector('.active') as HTMLElement;
-      if (!active) return;
-
-      const top = active.offsetTop;
-      const bottom = top + active.offsetHeight;
-
-      if (top < container.scrollTop) {
-        container.scrollTop = top - 20;
-      } else if (bottom > container.scrollTop + container.clientHeight) {
-        container.scrollTop = bottom - container.clientHeight + 20;
+    if (this.index === this.letters.length) {
+      if (this.gameMode !== 'endless') {
+        this.finishTest();
       }
-    });
+    }
   }
 
   finishTest() {
@@ -165,13 +230,9 @@ export class TypingComponent implements OnInit, OnDestroy {
       : 0;
   }
 
-  setDifficulty(level: Difficulty) {
-    this.difficulty = level;
-    this.startGame();
-  }
-
   setGameMode(mode: GameMode) {
     this.gameMode = mode;
+    this.updateModeDescription();
     this.startGame();
   }
 
