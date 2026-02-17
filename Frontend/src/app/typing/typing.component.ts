@@ -14,7 +14,6 @@ type GameMode =
   | 'zen'
   | 'threeMistakes'
   | 'suddenDeath'
-  | 'endless'
   | 'accuracy';
 
 type TimedLevel = 'easy' | 'medium' | 'hard';
@@ -58,6 +57,7 @@ export class TypingComponent implements OnInit, OnDestroy {
     clearInterval(this.interval);
   }
 
+  // 🔥 MAIN START
   startGame() {
     clearInterval(this.interval);
 
@@ -66,25 +66,53 @@ export class TypingComponent implements OnInit, OnDestroy {
     this.finished = false;
     this.timerStarted = false;
 
-    if (this.gameMode === 'timed') {
-      this.totalTime =
-        this.timedLevel === 'easy' ? 60 :
-        this.timedLevel === 'medium' ? 90 : 120;
-      this.timeLeft = this.totalTime;
+    this.configureTimedSettings();
+    this.loadSentence();
+
+    setTimeout(() => {
+      this.sentenceBox?.nativeElement.scrollTo({ top: 0 });
+    });
+  }
+
+  // 🔥 TIMED RULES
+  private configureTimedSettings() {
+    if (this.gameMode !== 'timed') return;
+
+    if (this.timedLevel === 'easy') {
+      this.totalTime = 60;
+    } else if (this.timedLevel === 'medium') {
+      this.totalTime = 90;
+    } else {
+      this.totalTime = 120;
     }
+    this.timeLeft = this.totalTime;
+  }
+
+  // 🔥 SENTENCE LENGTH CONTROL
+  private getRequiredCharCount(): number {
+    if (this.gameMode !== 'timed') return 600;
+
+    if (this.timedLevel === 'easy') return 350;     // ~4–5 lines
+    if (this.timedLevel === 'medium') return 550;   // ~6–8 lines
+    return 800;                                     // 8+ lines
+  }
+
+  private loadSentence() {
+    const minChars = this.getRequiredCharCount();
 
     this.typingService.generateText('easy').subscribe({
       next: res => {
-        this.sentence = res.text;
+        let text = res.text;
+
+        while (text.length < minChars) {
+          text += ' ' + res.text;
+        }
+
+        this.sentence = text.trim();
         this.letters = this.sentence.split('').map(c => ({
           char: c,
           status: 'pending'
         }));
-
-        // Reset scroll to top
-        setTimeout(() => {
-          this.sentenceBox?.nativeElement.scrollTo({ top: 0 });
-        });
       },
       error: err => console.error(err)
     });
@@ -92,12 +120,11 @@ export class TypingComponent implements OnInit, OnDestroy {
 
   updateModeDescription() {
     const map: Record<GameMode, string> = {
-      timed: '⏱️ Timed Mode — Race against time. Speed + consistency wins.',
-      zen: '🧘 Zen Mode — No pressure. Type endlessly with calm focus.',
-      threeMistakes: '🎯 3 Mistakes — Precision challenge. Three errors and it ends.',
-      suddenDeath: '⚡ Sudden Death — One mistake = instant game over.',
-      endless: '♾️ Endless — Infinite text. Train stamina and flow.',
-      accuracy: '🎯 Accuracy Mode — No timer. Finish the text with maximum precision.'
+      timed: '⏱️ Timed Mode — Speed + accuracy under pressure.',
+      zen: '🧘 Zen Mode — No limits. Calm and continuous typing.',
+      threeMistakes: '🎯 3 Mistakes — Three errors and you are out.',
+      suddenDeath: '⚡ Sudden Death — One mistake ends it all.',
+      accuracy: '🎯 Accuracy Mode — No timer. Finish with precision.'
     };
     this.modeDescription = map[this.gameMode];
   }
@@ -108,41 +135,27 @@ export class TypingComponent implements OnInit, OnDestroy {
     this.timerStarted = true;
     this.interval = setInterval(() => {
       this.timeLeft--;
-      if (this.timeLeft <= 0) this.finishTest();
+      if (this.timeLeft <= 0) {
+        this.finishTest(); // ✅ FORCE END ON TIME
+      }
     }, 1000);
   }
 
-  // 🔥 AUTO SCROLL LOGIC (THE FIX)
+  // 🔥 AUTO SCROLL
   private scrollToActiveLetter() {
-    if (!this.sentenceBox) return;
+    const container = this.sentenceBox?.nativeElement;
+    const active = container?.children[this.index] as HTMLElement;
+    if (!container || !active) return;
 
-    const container = this.sentenceBox.nativeElement;
-    const activeSpan = container.children[this.index] as HTMLElement;
+    const top = active.offsetTop;
+    const bottom = top + active.offsetHeight;
 
-    if (!activeSpan) return;
-
-    const spanTop = activeSpan.offsetTop;
-    const spanBottom = spanTop + activeSpan.offsetHeight;
-
-    const viewTop = container.scrollTop;
-    const viewBottom = viewTop + container.clientHeight;
-
-    if (spanBottom > viewBottom - 20) {
-      container.scrollTo({
-        top: spanBottom - container.clientHeight + 40,
-        behavior: 'smooth'
-      });
-    }
-
-    if (spanTop < viewTop + 20) {
-      container.scrollTo({
-        top: spanTop - 20,
-        behavior: 'smooth'
-      });
+    if (bottom > container.scrollTop + container.clientHeight - 20) {
+      container.scrollTo({ top: bottom - container.clientHeight + 40, behavior: 'smooth' });
     }
   }
 
-  // 🔥 KEYBOARD HANDLING
+  // 🔥 KEYBOARD
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
 
@@ -151,22 +164,12 @@ export class TypingComponent implements OnInit, OnDestroy {
       event.stopPropagation();
     }
 
-    const target = event.target as HTMLElement;
-    if (
-      target.tagName === 'BUTTON' ||
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA'
-    ) {
-      return;
-    }
-
     if (this.finished) return;
 
     if (this.gameMode === 'timed') {
       this.startTimer();
     }
 
-    // BACKSPACE
     if (event.key === 'Backspace') {
       if (this.index > 0) {
         this.index--;
@@ -202,7 +205,7 @@ export class TypingComponent implements OnInit, OnDestroy {
     this.scrollToActiveLetter();
 
     if (this.index === this.letters.length) {
-      if (this.gameMode !== 'endless') {
+      if (this.gameMode !== 'zen') {
         this.finishTest();
       }
     }
@@ -215,9 +218,8 @@ export class TypingComponent implements OnInit, OnDestroy {
   }
 
   get accuracy() {
-    return this.index === 0
-      ? 0
-      : Math.round(((this.index - this.mistakes) / this.index) * 100);
+    return this.index === 0 ? 0 :
+      Math.round(((this.index - this.mistakes) / this.index) * 100);
   }
 
   get completion() {
