@@ -57,7 +57,6 @@ export class TypingComponent implements OnInit, OnDestroy {
     clearInterval(this.interval);
   }
 
-  // 🔥 MAIN START
   startGame() {
     clearInterval(this.interval);
 
@@ -74,27 +73,21 @@ export class TypingComponent implements OnInit, OnDestroy {
     });
   }
 
-  // 🔥 TIMED RULES
   private configureTimedSettings() {
     if (this.gameMode !== 'timed') return;
 
-    if (this.timedLevel === 'easy') {
-      this.totalTime = 60;
-    } else if (this.timedLevel === 'medium') {
-      this.totalTime = 90;
-    } else {
-      this.totalTime = 120;
-    }
+    this.totalTime =
+      this.timedLevel === 'easy' ? 60 :
+      this.timedLevel === 'medium' ? 90 : 120;
+
     this.timeLeft = this.totalTime;
   }
 
-  // 🔥 SENTENCE LENGTH CONTROL
   private getRequiredCharCount(): number {
     if (this.gameMode !== 'timed') return 600;
-
-    if (this.timedLevel === 'easy') return 350;     // ~4–5 lines
-    if (this.timedLevel === 'medium') return 550;   // ~6–8 lines
-    return 800;                                     // 8+ lines
+    if (this.timedLevel === 'easy') return 350;
+    if (this.timedLevel === 'medium') return 550;
+    return 800;
   }
 
   private loadSentence() {
@@ -103,7 +96,6 @@ export class TypingComponent implements OnInit, OnDestroy {
     this.typingService.generateText('easy').subscribe({
       next: res => {
         let text = res.text;
-
         while (text.length < minChars) {
           text += ' ' + res.text;
         }
@@ -135,36 +127,33 @@ export class TypingComponent implements OnInit, OnDestroy {
     this.timerStarted = true;
     this.interval = setInterval(() => {
       this.timeLeft--;
-      if (this.timeLeft <= 0) {
-        this.finishTest(); // ✅ FORCE END ON TIME
-      }
+      if (this.timeLeft <= 0) this.finishTest();
     }, 1000);
   }
 
-  // 🔥 AUTO SCROLL
   private scrollToActiveLetter() {
     const container = this.sentenceBox?.nativeElement;
     const active = container?.children[this.index] as HTMLElement;
     if (!container || !active) return;
 
-    const top = active.offsetTop;
-    const bottom = top + active.offsetHeight;
-
+    const bottom = active.offsetTop + active.offsetHeight;
     if (bottom > container.scrollTop + container.clientHeight - 20) {
-      container.scrollTo({ top: bottom - container.clientHeight + 40, behavior: 'smooth' });
+      container.scrollTo({
+        top: bottom - container.clientHeight + 40,
+        behavior: 'smooth'
+      });
     }
   }
 
-  // 🔥 KEYBOARD
   @HostListener('window:keydown', ['$event'])
   handleKey(event: KeyboardEvent) {
 
+    if (this.finished) return;
+
+    // 🚫 PREVENT BROWSER SCROLL ON SPACE
     if (event.key === ' ') {
       event.preventDefault();
-      event.stopPropagation();
     }
-
-    if (this.finished) return;
 
     if (this.gameMode === 'timed') {
       this.startTimer();
@@ -174,7 +163,6 @@ export class TypingComponent implements OnInit, OnDestroy {
       if (this.index > 0) {
         this.index--;
         this.letters[this.index].status = 'pending';
-        this.scrollToActiveLetter();
       }
       return;
     }
@@ -184,30 +172,33 @@ export class TypingComponent implements OnInit, OnDestroy {
     const current = this.letters[this.index];
     if (!current) return;
 
-    if (event.key === current.char) {
+    const typed = event.key;
+    const expected = current.char;
+
+    if (typed.toLowerCase() === expected.toLowerCase()) {
       current.status = 'correct';
     } else {
       current.status = 'wrong';
       this.mistakes++;
 
-      if (this.gameMode === 'suddenDeath') {
-        this.finishTest();
-        return;
-      }
-
-      if (this.gameMode === 'threeMistakes' && this.mistakes >= 3) {
+      if (
+        this.gameMode === 'suddenDeath' ||
+        (this.gameMode === 'threeMistakes' && this.mistakes >= 3)
+      ) {
         this.finishTest();
         return;
       }
     }
 
     this.index++;
-    this.scrollToActiveLetter();
 
-    if (this.index === this.letters.length) {
-      if (this.gameMode !== 'zen') {
-        this.finishTest();
-      }
+    // ✅ Scroll ONLY if NOT space
+    if (expected !== ' ') {
+      this.scrollToActiveLetter();
+    }
+
+    if (this.index === this.letters.length && this.gameMode !== 'zen') {
+      this.finishTest();
     }
   }
 

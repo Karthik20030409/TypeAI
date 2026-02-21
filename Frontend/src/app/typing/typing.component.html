@@ -11,18 +11,22 @@
   <div class="typing-app">
     <main class="typing-wrapper">
 
-      <!-- MODE DESCRIPTION -->
       <div class="motivation-top">
         {{ modeDescription }}
       </div>
 
+      <!-- TOP BAR -->
       <div class="typing-top three-zone">
 
         <!-- LEFT: TIMED LEVELS -->
-        <div class="difficulty" *ngIf="gameMode === 'timed'">
-          <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">Easy</button>
-          <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">Medium</button>
-          <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">Hard </button>
+        <div class="left-slot">
+          <div class="left-inner" *ngIf="gameMode === 'timed'">
+            <div class="difficulty">
+              <button [class.active]="timedLevel==='easy'" (click)="setTimedLevel('easy')">Easy</button>
+              <button [class.active]="timedLevel==='medium'" (click)="setTimedLevel('medium')">Medium</button>
+              <button [class.active]="timedLevel==='hard'" (click)="setTimedLevel('hard')">Hard</button>
+            </div>
+          </div>
         </div>
 
         <!-- CENTER: MODES -->
@@ -35,22 +39,27 @@
         </div>
 
         <!-- RIGHT: TIMER -->
-        <div class="timer" *ngIf="gameMode === 'timed'">
-          {{ timeLeft }}<span>s</span>
+        <div class="right-slot">
+          <div class="right-inner" *ngIf="gameMode === 'timed'">
+            <div class="timer">
+              {{ timeLeft }}<span>s</span>
+            </div>
+          </div>
         </div>
-
       </div>
 
+      <!-- TYPING CARD -->
       <div class="typing-card">
 
+        <!-- ✅ TYPING VIEW -->
         <ng-container *ngIf="!finished; else resultView">
+
           <div class="sentence" #sentenceBox>
             <span
               *ngFor="let l of letters; let i = index"
               [class.pending]="l.status==='pending'"
               [class.correct]="l.status==='correct'"
-              [class.wrong]="l.status==='wrong'"
-              [class.active]="i === index">
+              [class.wrong]="l.status==='wrong'">
               {{ l.char === ' ' ? '\u00A0' : l.char }}
             </span>
           </div>
@@ -58,8 +67,10 @@
           <p class="hint" *ngIf="!timerStarted && gameMode === 'timed'">
             Start typing to begin ⌨️
           </p>
+
         </ng-container>
 
+        <!-- ✅ RESULT VIEW (RESTORED) -->
         <ng-template #resultView>
           <div class="dashboard">
 
@@ -79,6 +90,7 @@
               <p>Completion</p>
             </div>
 
+            <!-- TIME ONLY FOR TIMED -->
             <div class="meter" *ngIf="gameMode === 'timed'">
               <div class="circle"
                 [style.background]="'conic-gradient(#ff9800 ' + ((timeTaken / totalTime) * 100) + '%, #ddd 0)'">
